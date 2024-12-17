@@ -1,0 +1,141 @@
+// Importar Sequelize
+const { Sequelize, DataTypes } = require('sequelize');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../config/.env') });
+
+
+console.log(process.env.DATABASE_PASSWORD)
+// Configurar la conexión a la base de datos
+const sequelize = new Sequelize(process.env.DATABASE_NAME, process.env.DATABASE_USER, process.env.DATABASE_PASSWORD, {
+    host: process.env.DATABASE_HOST,
+    dialect: 'postgres',
+});
+
+// Modelos
+const UserType = sequelize.define('UserType', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    typeName: { type: DataTypes.STRING, allowNull: false },
+});
+
+const User = sequelize.define('User', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userName: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false },
+    password: { type: DataTypes.STRING, allowNull: false },
+    phoneNum: { type: DataTypes.STRING },
+    userType: { type: DataTypes.INTEGER, allowNull: false, references: { model: UserType, key: 'id' } },
+});
+
+const Family = sequelize.define('Family', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: 'id' } },
+    name: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.STRING },
+});
+
+const Recipe = sequelize.define('Recipe', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    familyId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Family, key: 'id' } },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: 'id' } },
+    description: { type: DataTypes.STRING },
+    PATotal: { type: DataTypes.INTEGER },
+    PODTotal: { type: DataTypes.INTEGER },
+    MGTotal: { type: DataTypes.INTEGER },
+    STTotal: { type: DataTypes.INTEGER },
+    LPTotal: { type: DataTypes.INTEGER },
+    percentCacao: { type: DataTypes.FLOAT },
+    TS: { type: DataTypes.INTEGER },
+    price: { type: DataTypes.FLOAT },
+});
+
+const Ingredient = sequelize.define('Ingredient', {
+    ingredientId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: 'id' } },
+    name: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.STRING },
+    ST: { type: DataTypes.FLOAT },
+    LPD: { type: DataTypes.FLOAT },
+    MG: { type: DataTypes.FLOAT },
+    PAC: { type: DataTypes.FLOAT },
+    POD: { type: DataTypes.FLOAT },
+    percentsugar: { type: DataTypes.FLOAT },
+    percentCocoa: { type: DataTypes.FLOAT },
+    percentCocoaButter: { type: DataTypes.FLOAT },
+    CantMax18: { type: DataTypes.FLOAT },
+    CantMax11: { type: DataTypes.FLOAT },
+    proportion: { type: DataTypes.FLOAT },
+    percentsalt: { type: DataTypes.FLOAT },
+    grade: { type: DataTypes.FLOAT },
+    CantMin: { type: DataTypes.FLOAT },
+});
+
+const IngredientRecipe = sequelize.define('IngredientRecipe', {
+    ingredientId: { type: DataTypes.INTEGER, references: { model: Ingredient, key: 'ingredientId' } },
+    recipeId: { type: DataTypes.INTEGER, references: { model: Recipe, key: 'id' } },
+    quantity18: { type: DataTypes.INTEGER },
+    quantity11: { type: DataTypes.INTEGER },
+});
+
+const Provider = sequelize.define('Provider', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    tlf: { type: DataTypes.STRING },
+    address: { type: DataTypes.STRING },
+});
+
+const IngredientProvider = sequelize.define('IngredientProvider', {
+    ingredientId: { type: DataTypes.INTEGER, references: { model: Ingredient, key: 'ingredientId' } },
+    providerId: { type: DataTypes.INTEGER, references: { model: Provider, key: 'id' } },
+    price: { type: DataTypes.FLOAT },
+});
+
+const Allergen = sequelize.define('Allergen', {
+    allergenId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    description: { type: DataTypes.STRING },
+    img: { type: DataTypes.BLOB },
+});
+
+const IngredientAllergen = sequelize.define('IngredientAllergen', {
+    ingredientId: { type: DataTypes.INTEGER, references: { model: Ingredient, key: 'ingredientId' } },
+    allergenId: { type: DataTypes.INTEGER, references: { model: Allergen, key: 'allergenId' } },
+});
+
+// Relaciones
+
+UserType.hasMany(User, { foreignKey: 'userType' });
+User.hasMany(Family, { foreignKey: 'userId' });
+User.hasMany(Ingredient, { foreignKey: 'userId' });
+User.hasMany(Recipe, { foreignKey: 'userId' });
+Family.hasMany(Recipe, { foreignKey: 'familyId' });
+Recipe.belongsToMany(Ingredient, { through: IngredientRecipe, foreignKey: 'recipeId' });
+Ingredient.belongsToMany(Recipe, { through: IngredientRecipe, foreignKey: 'ingredientId' });
+Ingredient.belongsToMany(Allergen, { through: IngredientAllergen, foreignKey: 'ingredientId' });
+Allergen.belongsToMany(Ingredient, { through: IngredientAllergen, foreignKey: 'allergenId' });
+Ingredient.belongsToMany(Provider, { through: IngredientProvider, foreignKey: 'ingredientId' });
+Provider.belongsToMany(Ingredient, { through: IngredientProvider, foreignKey: 'providerId' });
+
+// Sincronizar modelos
+(async () => {
+    try {
+        await sequelize.sync({ force: true }); // Forzar sincronización para desarrollo
+        console.log('Base de datos sincronizada.');
+    } catch (error) {
+        console.error('Error al sincronizar la base de datos:', error);
+    }
+})();
+
+module.exports = {
+    sequelize, // Exportar la instancia de Sequelize (por si necesitas operaciones adicionales)
+    UserType,
+    User,
+    Family,
+    Recipe,
+    Ingredient,
+    IngredientRecipe,
+    Provider,
+    IngredientProvider,
+    Allergen,
+    IngredientAllergen,
+};
+
