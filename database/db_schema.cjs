@@ -1,10 +1,13 @@
-// Importar Sequelize
 const { Sequelize, DataTypes } = require('sequelize');
+const dotenv = require('dotenv');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../config/.env') });
 
+// Construir la ruta correcta al archivo .env en ../config/.env
+const envPath = path.resolve(__dirname, '../config/.env');
 
-console.log(process.env.DATABASE_PASSWORD)
+// Cargar las variables de entorno desde el archivo .env
+dotenv.config({ path: envPath });
+
 // Configurar la conexión a la base de datos
 const sequelize = new Sequelize(process.env.DATABASE_NAME, process.env.DATABASE_USER, process.env.DATABASE_PASSWORD, {
     host: process.env.DATABASE_HOST,
@@ -18,7 +21,7 @@ const UserType = sequelize.define('UserType', {
 });
 
 const User = sequelize.define('User', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    uuid: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true},
     userName: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
@@ -28,7 +31,7 @@ const User = sequelize.define('User', {
 
 const Family = sequelize.define('Family', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: 'id' } },
+    userId: { type: DataTypes.UUID, allowNull: false, references: { model: User, key: 'uuid' } },  // Actualizar a UUID
     name: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.STRING },
 });
@@ -37,7 +40,7 @@ const Recipe = sequelize.define('Recipe', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
     familyId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Family, key: 'id' } },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: 'id' } },
+    userId: { type: DataTypes.UUID, allowNull: false, references: { model: User, key: 'uuid' } },  // Actualizar a UUID
     description: { type: DataTypes.STRING },
     PATotal: { type: DataTypes.INTEGER },
     PODTotal: { type: DataTypes.INTEGER },
@@ -51,7 +54,7 @@ const Recipe = sequelize.define('Recipe', {
 
 const Ingredient = sequelize.define('Ingredient', {
     ingredientId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: 'id' } },
+    userId: { type: DataTypes.UUID, allowNull: false, references: { model: User, key: 'uuid' } },  // Actualizar a UUID
     name: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.STRING },
     ST: { type: DataTypes.FLOAT },
@@ -118,7 +121,7 @@ Provider.belongsToMany(Ingredient, { through: IngredientProvider, foreignKey: 'p
 // Sincronizar modelos
 (async () => {
     try {
-        await sequelize.sync({ force: true }); // Forzar sincronización para desarrollo
+        await sequelize.sync({alter: true}); // Forzar sincronización para desarrollo
         console.log('Base de datos sincronizada.');
     } catch (error) {
         console.error('Error al sincronizar la base de datos:', error);
@@ -126,7 +129,7 @@ Provider.belongsToMany(Ingredient, { through: IngredientProvider, foreignKey: 'p
 })();
 
 module.exports = {
-    sequelize, // Exportar la instancia de Sequelize (por si necesitas operaciones adicionales)
+    sequelize,
     UserType,
     User,
     Family,
@@ -138,4 +141,3 @@ module.exports = {
     Allergen,
     IngredientAllergen,
 };
-
