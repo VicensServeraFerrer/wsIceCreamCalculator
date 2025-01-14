@@ -18,7 +18,7 @@ userRouter.post("/create", async (req, res) => {
     if(!name || !email || !password || !tlf){
         return res.status(400).json({
             error: 'Campos incompletos',
-            mensaje: 'Por favor, asegúrate de proporcionar nombre, email y contraseña.',
+            mensaje: 'Por favor, asegúrate de proporcionar nombre, email, contraseña y teléfono.',
             camposFaltantes: [
               !name ? 'nombre' : null,
               !email ? 'email' : null,
@@ -28,11 +28,20 @@ userRouter.post("/create", async (req, res) => {
           });
     }
 
+    //Control de existència de usuario
+    const userExists = await User.findOne({where: {"email": email}});
+    console.log(userExists);
+    if(userExists){
+      return res.status(400).send("El usuario ya se encuentra registrado");
+    }
+
+    //Codificar contraseña del cliente
     const hashed_password = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({userName: name, email: email, password: hashed_password, phoneNum: tlf, userType: 4})
+    //Creación del nuevo usuario
+    const newUser = await User.create({userName: name, email: email, password: hashed_password, phoneNum: tlf, userType: 2})
 
-    res.end(JSON.stringify({code: 200,
+    return res.status(200).send(JSON.stringify({
         uuid: newUser.uuid,
     }))
 });
