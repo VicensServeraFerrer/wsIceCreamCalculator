@@ -1,4 +1,3 @@
-import express from 'express';
 import bcrypt from 'bcrypt';
 import db from '../database/db_schema.cjs';
 
@@ -8,9 +7,14 @@ async function authByEmailPassword(email, password){
 
     const user = await User.findOne({where: {"email": email}});
 
-    if(!user) return null;
+    if(!user) throw new Error("El usuario es incorrectp");
 
-    if(await bcrypt.compare(password, user["password"])) return user["uuid"];
+    const match = await bcrypt.compare(password, user["password"])
+    
+    if (match) return user["uuid"];
+    
+    throw new Error("La contraseña es incorrecta");
+    
 }
 
 export default authByEmailPassword;
