@@ -14,7 +14,6 @@ async function authByEmailPassword(email, password){
     if (match) return user["uuid"];
     
     throw new Error("La contraseña es incorrecta");
-    
 }
 
 export default authByEmailPassword;
