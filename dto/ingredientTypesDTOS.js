@@ -406,5 +406,6 @@ export default {
     spiceDTOSchema, 
     cheeseDTOSchema,
     saltyDTOSchema,
-    alcoholDTOSchema
+    alcoholDTOSchema,
+    genericDTOSchema
 }

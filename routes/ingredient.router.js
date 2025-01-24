@@ -1,9 +1,10 @@
 import express from 'express';
 import db from '../database/db_schema.cjs';
-import authRouter from './auth.router';
+import validateCreateIngredientDTO from '../dto/validateCreateIngredientDTO.js';
+import authByToken from '../helpers/authByToken.js';
 
 const ingredientRouter = express.Router();
 
-ingredientRouter.post("/create", (req, res) => {
+ingredientRouter.post("/create",authByToken, validateCreateIngredientDTO, (req, res) => {
     
 });
