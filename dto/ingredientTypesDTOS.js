@@ -354,6 +354,16 @@ const genericDTOSchema = Type.Object(
             minimum: 0,
             maximum: 100
         }),
+        MG: Type.Number({
+            errorMessage: "La materia grasa animal tiene que ser un numero",
+            minimum: 0,
+            maximum: 100
+        }),
+        MGV: Type.Number({
+            errorMessage: "La materia grasa vegetal tiene que ser un numero",
+            minimum: 0,
+            maximum: 100
+        }),
         LPD: Type.Number({
             errorMessage: "La leche en polvo desnatada tiene que ser un numero",
             minimum: 0,

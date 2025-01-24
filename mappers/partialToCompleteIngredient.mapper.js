@@ -1,3 +1,7 @@
+import calculateIngredientPAC from "../helpers/calculateIngredientPAC";
+import calculateIngredientPOD from "../helpers/calculateIngredientPOD";
+import calculateMaxCant from "../helpers/calculateMaxCant";
+
 function partialToCompleteIngredientMapper(req, res, next)
 {
     const ingredient = req.body;
@@ -10,13 +14,13 @@ function partialToCompleteIngredientMapper(req, res, next)
         ST: ingredient.ST,
         LPD: ingredient.LPD ? ingredient.LPD : null,
         MG: ingredient.MG ? ingredient.LPD : null,
-        PAC: 0, //Hacer gestion
-        POD: 0, //hacer gestion
+        PAC: calculateIngredientPAC(ingredient),
+        POD: calculateIngredientPOD(ingredient), 
         percentsugar: ingredient.percentsugar ? ingredient.percentsugar : null,
         percentCocoa: ingredient.percentCocoa ? ingredient.percentCocoa : null,
         percentCocoaButter: ingredient.percentCocoaButter ? ingredient.percentCocoaButter : null,
-        CantMax18: null, //hacer gestion
-        CantMas11: null, //Hacer gestion
+        CantMax18: ingredientType == 9 ? calculateMaxCant(ingredient, -18) : null, 
+        CantMax11: ingredientType == 9 ? calculateMaxCant(ingredient, -11) : null, 
         proportion: ingredient.proportion ? ingredient.proportion : null,
         percentsalt: ingredient.percentsalt ? ingredient.percentsalt : null,
         grade: ingredient.grade ? ingredient.grade : null,
