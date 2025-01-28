@@ -1,9 +1,9 @@
 import Ajv from 'ajv';
 import addErrors from 'ajv-errors';
-import ingredientTypesDTOS from "./ingredientTypesDTOS";
+import addFormats from 'ajv-formats';
+import ingredientTypesDTOS from "./ingredientTypesDTOS.js";
 
 const ajv = new Ajv({allErrors: true});
-addKeyword("kind").addKeyword("modifier");
 addErrors(ajv);
 
 function validateCreateIngredientDTO(req, res, next) {

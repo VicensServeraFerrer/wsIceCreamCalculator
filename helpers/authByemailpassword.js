@@ -7,7 +7,7 @@ async function authByEmailPassword(email, password){
 
     const user = await User.findOne({where: {"email": email}});
 
-    if(!user) throw new Error("El usuario es incorrectp");
+    if(!user) throw new Error("El usuario es incorrect");
 
     const match = await bcrypt.compare(password, user["password"])
     

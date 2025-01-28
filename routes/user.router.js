@@ -12,7 +12,7 @@ userRouter.post("/create", validateCreateUserDTO, async (req, res) => {
 
     //Control de existència de usuario
     const userExists = await User.findOne({where: {"email": email}});
-    console.log(userExists);
+    
     if(userExists){
       return res.status(400).send("El usuario ya se encuentra registrado");
     }

@@ -1,4 +1,4 @@
-import calculateIngredientPAC from "./calculateIngredientPAC";
+import calculateIngredientPAC from "./calculateIngredientPAC.js";
 
 function calculateMaxCant(ingredient, temperature){
     const referencePAC = temperature == -11 ? 270 : 410;
@@ -8,4 +8,4 @@ function calculateMaxCant(ingredient, temperature){
     return (referencePAC - 150) / pacIngredient; 
 }
 
-export default calculateMaxCant
+export default calculateMaxCant;

@@ -28,8 +28,6 @@ const milkDTOSchema = Type.Object(
         }),
         PAC: Type.Number({
             errorMessage: "El poder anticongelante tiene que ser un numero",
-            minimum: 0,
-            maximum: 100
         }),
     },
     {
@@ -63,8 +61,6 @@ const sugarDTOSchema = Type.Object(
         }),
         PAC: Type.Number({
             errorMessage: "El poder anticongelante tiene que ser un numero",
-            minimum: 0,
-            maximum: 100
         }),
     },
     {
@@ -292,7 +288,7 @@ const saltyDTOSchema = Type.Object(
             maximum: 100
         }),
         PAC: Type.Number({
-            errorMessage: "El poder anticongelante tiene que ser un numero",s
+            errorMessage: "El poder anticongelante tiene que ser un numero",
         }),
     },
     {
