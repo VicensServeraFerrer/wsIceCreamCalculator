@@ -7,6 +7,16 @@ import partialToCompleteIngredientMapper from '../mappers/partialToCompleteIngre
 const ingredientRouter = express.Router();
 const { Ingredient } = db;
 
+ingredientRouter.get("/get/:name", authByToken, async (req, res) => {
+    const { name } = req.params;
+
+    const ingredient = await Ingredient.findOne({where: {"userId": req.jwtData.payload.uuid, "name": name}})
+
+    if(!ingredient) return res.status(200).send(JSON.stringify({message: "No existe el ingrediente"}));
+
+    return res.status(200).send(JSON.stringify(ingredient))
+})
+
 ingredientRouter.get("/getAll/:ingredientType", authByToken, async (req, res) => {
     const { ingredientType } = req.params;
 

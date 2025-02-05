@@ -13,7 +13,7 @@ function partialToCompleteIngredientMapper(req, res, next)
         ingredientType: ingredient.ingredientType,
         ST: ingredient.ST,
         LPD: ingredient.LPD ? ingredient.LPD : null,
-        MG: ingredient.MG ? ingredient.LPD : null,
+        MG: ingredient.MG ? ingredient.MG : null,
         PAC: calculateIngredientPAC(ingredient),
         POD: calculateIngredientPOD(ingredient), 
         percentsugar: ingredient.percentsugar ? ingredient.percentsugar : null,

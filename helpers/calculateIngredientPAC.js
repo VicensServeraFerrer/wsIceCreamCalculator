@@ -4,7 +4,8 @@ function calculateIngredientPAC(ingredient){
 
     switch(ingredientType){
         //Milk & Sugar
-        case 1, 2:
+        case 1:
+        case 2:
             return ingredient.PAC;
         //Fruit
         case 3:
@@ -19,7 +20,8 @@ function calculateIngredientPAC(ingredient){
         case 6:
             return null;
         //Cheese & salty
-        case 7, 8:
+        case 7:
+        case 8:
             return ingredient.PAC + ingredient.percentsalt;
         //Alcohol
         case 9:
