@@ -5,7 +5,6 @@ import authRouter from './routes/auth.router.js';
 import ingredientRouter from './routes/ingredient.router.js';
 
 dotenv.config();
-console.log(process.env)
 
 const PORT =  3000;
 const expressApp = express()
