@@ -147,4 +147,5 @@ module.exports = {
     IngredientProvider,
     Allergen,
     IngredientAllergen,
+    Type,
 };
