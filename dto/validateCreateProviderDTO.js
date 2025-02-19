@@ -3,26 +3,21 @@ import Ajv from 'ajv';
 import addFormat from 'ajv-formats';
 import addErrors from 'ajv-errors';
 
-const CreateUserDTOSchema = Type.Object(
+const CreateProviderDTOSchema = Type.Object(
     {
         name: Type.String({
             errorMessage: {
                 type: "El nombre tiene que ser un string"
             }
         }),
-        email: Type.String({
-            format: "email",
+        tlf: Type.String({
             errorMessage: {
-                type: "El tipo tiene que ser un string",
-                format: "El email tiene que ser un correo electronico vàlido"
+                type: "El telefono tiene que ser un string"
             }
         }),
-        password: Type.String({
-            errorMessage: "La contraseña tiene que ser un String"
+        address: Type.String({
+            errorMessage: "La dirección tiene que ser un String"
         }),
-        tlf: Type.String({
-            errorMessage: "El telefono tiene que ser un string"
-        })
     },
     {
         additionalProperties: false,
@@ -35,7 +30,7 @@ const CreateUserDTOSchema = Type.Object(
 const ajv = new Ajv({allErrors: true});
 addFormat(ajv, ["email"]).addKeyword("kind").addKeyword("modifier");
 addErrors(ajv);
-const validate = ajv.compile(CreateUserDTOSchema);
+const validate = ajv.compile(CreateProviderDTOSchema);
 
 function validateCreateUserDTO (req, res, next) {
     const isValidDto = validate(req.body);

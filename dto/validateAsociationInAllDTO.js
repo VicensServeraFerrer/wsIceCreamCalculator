@@ -3,26 +3,18 @@ import Ajv from 'ajv';
 import addFormat from 'ajv-formats';
 import addErrors from 'ajv-errors';
 
-const CreateUserDTOSchema = Type.Object(
+const AsociateInProDTOSchema = Type.Object(
     {
-        name: Type.String({
+        ingredientId: Type.Number({
             errorMessage: {
-                type: "El nombre tiene que ser un string"
+                type: "El id del ingrediente tiene que ser un numero"
             }
         }),
-        email: Type.String({
-            format: "email",
+        allergenId: Type.Number({
             errorMessage: {
-                type: "El tipo tiene que ser un string",
-                format: "El email tiene que ser un correo electronico vàlido"
+                type: "El id del proveedor tiene que ser un numero"
             }
         }),
-        password: Type.String({
-            errorMessage: "La contraseña tiene que ser un String"
-        }),
-        tlf: Type.String({
-            errorMessage: "El telefono tiene que ser un string"
-        })
     },
     {
         additionalProperties: false,
@@ -35,9 +27,9 @@ const CreateUserDTOSchema = Type.Object(
 const ajv = new Ajv({allErrors: true});
 addFormat(ajv, ["email"]).addKeyword("kind").addKeyword("modifier");
 addErrors(ajv);
-const validate = ajv.compile(CreateUserDTOSchema);
+const validate = ajv.compile(AsociateInProDTOSchema);
 
-function validateCreateUserDTO (req, res, next) {
+function validateAsociationInAllDTO (req, res, next) {
     const isValidDto = validate(req.body);
 
     if (!isValidDto) return res.status(400).send(ajv.errorsText(validate.errors, {separator: '\n'}));
@@ -46,4 +38,4 @@ function validateCreateUserDTO (req, res, next) {
 }
 
 
-export default validateCreateUserDTO;
+export default validateAsociationInAllDTO;
