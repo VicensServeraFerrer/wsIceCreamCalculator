@@ -39,14 +39,14 @@ const Family = sequelize.define('Family', {
 const Recipe = sequelize.define('Recipe', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
-    familyId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Family, key: 'id' } },
+    familyId: { type: DataTypes.INTEGER, allowNull: true, references: { model: Family, key: 'id' } },
     userId: { type: DataTypes.UUID, allowNull: false, references: { model: User, key: 'uuid' } },  // Actualizar a UUID
     description: { type: DataTypes.STRING },
     PATotal: { type: DataTypes.INTEGER },
     PODTotal: { type: DataTypes.INTEGER },
     MGTotal: { type: DataTypes.INTEGER },
     STTotal: { type: DataTypes.INTEGER },
-    LPTotal: { type: DataTypes.INTEGER },
+    LPDTotal: { type: DataTypes.INTEGER },
     percentCacao: { type: DataTypes.FLOAT },
     TS: { type: DataTypes.INTEGER },
     price: { type: DataTypes.FLOAT },

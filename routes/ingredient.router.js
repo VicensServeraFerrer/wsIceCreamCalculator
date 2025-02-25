@@ -3,7 +3,6 @@ import db from '../database/db_schema.cjs';
 import validateCreateIngredientDTO from '../dto/validateCreateIngredientDTO.js';
 import authByToken from '../helpers/authByToken.js';
 import partialToCompleteIngredientMapper from '../mappers/partialToCompleteIngredient.mapper.js';
-import { where } from 'sequelize';
 
 const ingredientRouter = express.Router();
 const { Ingredient, Type } = db;
