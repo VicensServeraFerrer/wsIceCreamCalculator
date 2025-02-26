@@ -16,6 +16,14 @@ const CreateUserDTOSchema = Type.Object(
         familyId: Type.Number({
             errorMessage: "La id de la familia tiene que ser un numero"
         }),
+        POD: Type.Union(
+            [
+                Type.Number(),
+                Type.Null()
+            ],
+            {
+            errorMessage: "La materia grasa tiene que ser un numero o null"
+        }),
         MG: Type.Union(
             [
                 Type.Number(),
@@ -43,7 +51,7 @@ const CreateUserDTOSchema = Type.Object(
         TS: Type.Number({
             errorMessage: "La temperatura de servicio tiene que ser un numero o null"
         }),
-        percentCacao: Type.Union(
+        percentCocoa: Type.Union(
             [
                 Type.Number(),
                 Type.Null()

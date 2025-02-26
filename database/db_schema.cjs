@@ -42,7 +42,7 @@ const Recipe = sequelize.define('Recipe', {
     familyId: { type: DataTypes.INTEGER, allowNull: true, references: { model: Family, key: 'id' } },
     userId: { type: DataTypes.UUID, allowNull: false, references: { model: User, key: 'uuid' } },  // Actualizar a UUID
     description: { type: DataTypes.STRING },
-    PATotal: { type: DataTypes.INTEGER },
+    PACTotal: { type: DataTypes.INTEGER },
     PODTotal: { type: DataTypes.INTEGER },
     MGTotal: { type: DataTypes.INTEGER },
     STTotal: { type: DataTypes.INTEGER },
