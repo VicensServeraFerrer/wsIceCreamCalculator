@@ -18,7 +18,7 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
 
         const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid}});
 
-        let matrixA = buildMatrixA(fullIngredients);
+        let matrixA = buildMatrixA(fullIngredients, req.body);
         let matrixB = [getPAC(req.body.TS), req.body.POD, req.body.MG, req.body.ST, req.body.LPD, req.body.percentCocoa];
 
         console.log(matrixA);

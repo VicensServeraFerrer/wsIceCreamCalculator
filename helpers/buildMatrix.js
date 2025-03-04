@@ -7,33 +7,53 @@
 //     percentCocoa: []
 // }
 import glpk from "glpk.js"
+import { Ingredient } from "../database/db_schema.cjs";
 
-const glpkInstance = await glpk();
+async function initializeMatrix(){
+    const glpkInstance = await glpk();
 
-let matrix = {
-    name: "",
-    objective: {
-        direction: glpkInstance.GLP_MIN,
-        name: "obj",
-        vars: []
-    },
-    subjectTo: [
-        { name: "PAC", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } },
-        { name: "POD", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } },
-        { name: "MG", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } },
-        { name: "ST", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } },
-        { name: "LPD", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } },
-        { name: "percentCocoa", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } },
-        { name: "suma1000", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } }
-    ], 
-    bounds: [
-        
-    ],
+    let matrix = {
+        name: "",
+        objective: {
+            direction: glpkInstance.GLP_MIN,
+            name: "obj",
+            vars: []
+        },
+        subjectTo: [
+            { name: "PAC", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 0, lb: 0 } },
+            { name: "POD", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 0, lb: 0 } },
+            { name: "MG", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 0, lb: 0 } },
+            { name: "ST", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 0, lb: 0 } },
+            { name: "LPD", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 0, lb: 0 } },
+            { name: "percentCocoa", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 0, lb: 0 } },
+        ], 
+        bounds: [
+            
+        ],
+    }
+
+    return {matrix, glpkInstance};
 }
+
 
 const matrixKeys = Object.keys(matrix);
 
-function buildMatrixA(ingredients){
+function buildMatrixA(ingredients, bounds){
+    let {matrix, glpkInstance} = initializeMatrix();
+
+    ingredients.forEach(ingredient => {
+        matrix.objective.vars.push(ingredient.dataValues.name);
+    });
+
+    matrix.subjectTo.forEach(subject => {
+        ingredients.forEach(ingredient => {
+            const ingredientVariable = {name: ingredient.dataValues.name, coef: ingredient.dataValues[subject.name] ? ingredient.dataValues[subject.name] : 0}
+
+            subject.vars.push(ingredientVariable);
+        })
+    })
+
+    
 
     for(let i = 0; i < matrixKeys.length; i++){
         for(let j = 0; j < ingredients.length; j++){
