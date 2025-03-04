@@ -2,7 +2,7 @@ import express from 'express';
 import db from '../database/db_schema.cjs';
 import authByToken from '../helpers/authByToken.js';
 import validateCreateRecipeByCalculatorDTO from '../dto/validateCreateRecipeByCalculatorDTO.js';
-import buildMatrixA from '../helpers/buildMatrix.js';
+import buildMatrix from '../helpers/buildMatrix.js';
 import getPAC from '../helpers/getPAC.js';
 import * as math from 'mathjs'
 
@@ -18,7 +18,7 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
 
         const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid}});
 
-        let matrixA = buildMatrixA(fullIngredients, req.body);
+        let matrixA = buildMatrix(fullIngredients, req.body);
         let matrixB = [getPAC(req.body.TS), req.body.POD, req.body.MG, req.body.ST, req.body.LPD, req.body.percentCocoa];
 
         console.log(matrixA);

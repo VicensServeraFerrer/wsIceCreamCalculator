@@ -34,10 +34,7 @@ async function initializeMatrix(){
     return {matrix, glpkInstance};
 }
 
-
-const matrixKeys = Object.keys(matrix);
-
-function buildMatrixA(ingredients, bounds){
+function buildMatrix(ingredients, bounds){
     let {matrix, glpkInstance} = initializeMatrix();
 
     matrix.subjectTo.forEach(subject => {
@@ -66,4 +63,4 @@ function buildMatrixA(ingredients, bounds){
     return matrix
 }
 
-export default buildMatrixA
+export default buildMatrix
