@@ -6,6 +6,7 @@ import validateCreateUserDTO from '../dto/validateCreateUserDTO.js';
 const userRouter = express.Router();
 const { User } = db
 
+// localhost:3000/auth/create
 // Aportando los datos correspondientes (nombre, email, contraseña y numero de telefono) crea una cuenta para este usuario
 userRouter.post("/create", validateCreateUserDTO, async (req, res) => {
     const {name, email, password, tlf} = req.body;
