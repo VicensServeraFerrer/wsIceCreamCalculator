@@ -18,52 +18,7 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
 
         const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid}});
 
-        let matrixA = buildMatrix(fullIngredients, req.body);
-        let matrixB = [getPAC(req.body.TS), req.body.POD, req.body.MG, req.body.ST, req.body.LPD, req.body.percentCocoa];
-
-        console.log(matrixA);
-        console.log(matrixB);
-
-        let i = 0;
-        const ingredientsIndexed = ingredients.map(ingredient => {
-            ingredient["index"] = i++;
-            return ingredient;
-        });
-
-        let newMatrixA = [...matrixA];
-        let newMatrixB = [...matrixB];
-
-        //En caso de tener una cantidad fiada para un ingrediente se tiene que compensar la aportacion y modificar la matriz
-        ingredientsIndexed.forEach(({id, quantity, index}) => {
-            if(quantity){
-                newMatrixB = newMatrixB.map((value, rowIndex) => value - matrixA[rowIndex][index] * quantity);
-
-                newMatrixA = newMatrixA.map(row => row.filter((_, colIndex) => colIndex !== index));
-            }  
-        });
-
-        
-
-        let sumEquation = Array(newMatrixA[0].length).fill(1);
-        let adjustedTotal = 1000 - ingredientsIndexed.reduce((sum, {quantity}) => sum + quantity, 0);
-        
-        newMatrixA.push(sumEquation);
-        newMatrixB.push(adjustedTotal);
-
-        console.log(newMatrixA);
-        console.log(newMatrixB);
-        // 🔹 Resolver el sistema usando la pseudo-inversa
-        let pseudoInverse = math.pinv(newMatrixA);
-
-        newMatrixB = newMatrixB.map(valor => [valor]);
-        let solution = math.multiply(pseudoInverse, newMatrixB);
-
-        console.log(solution)
-        //🔹 Reconstruir la solución final incluyendo los ingredientes fijados
-        let finalSolution = [];
-        for (let i = 0, j = 0; i < matrixA[0].length; i++) {
-            finalSolution[i] = ingredientsIndexed.find(fixed => fixed.index === i && fixed.quantity !== null) ? ingredientsIndexed.find(fixed => fixed.index === i).quantity : solution[j++];
-        }
+        let matrix = buildMatrix(fullIngredients, req.body);
 
         // import glpk from 'glpk.js';
 
