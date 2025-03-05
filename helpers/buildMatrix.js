@@ -7,6 +7,7 @@
 //     percentCocoa: []
 // }
 import glpk from "glpk.js"
+import getPAC from "./getPAC.js";
 
 async function initializeMatrix(){
     const glpkInstance = await glpk();
@@ -34,17 +35,34 @@ async function initializeMatrix(){
     return {matrix, glpkInstance};
 }
 
-function buildMatrix(ingredients, bounds){
-    let {matrix, glpkInstance} = initializeMatrix();
+async function buildMatrix(ingredients, bounds){
+    let {matrix, glpkInstance} = await initializeMatrix();
 
+    console.log(matrix);
     matrix.subjectTo.forEach(subject => {
-        subject.bnds.ub = bounds[subject.name] ? bounds[subject.name] : 0;
-        subject.bnds.lb = bounds[subject.name] ? bounds[subject.name] : 0;
+        if(subject.name == 'PAC') {
+            const {PAClb, PACub} = getPAC(bounds.TS);
+
+            subject.bnds.ub = PACub;
+            subject.bnds.lb = PAClb;
+        } else {
+            subject.bnds.ub = bounds[subject.name] ? bounds[subject.name] : 0;
+            subject.bnds.lb = bounds[subject.name] ? 0 : 0;
+        }
+        
 
         ingredients.forEach(ingredient => {
-            const ingredientVariable = {name: ingredient.dataValues.name, coef: ingredient.dataValues[subject.name] ? ingredient.dataValues[subject.name] : 0}
+            const ingredientVariable = {name: ingredient.dataValues.name, coef: ingredient.dataValues[subject.name] ? ingredient.dataValues[subject.name]/100 : 0}
 
             subject.vars.push(ingredientVariable);
+        })
+    })
+
+    matrix.subjectTo = matrix.subjectTo.filter(subject => noRelevantEquation(subject));
+    
+    matrix.subjectTo.forEach(subject => {
+        subject.vars = subject.vars.filter(variable => {
+            return variable.coef != 0;
         })
     })
     
@@ -60,7 +78,15 @@ function buildMatrix(ingredients, bounds){
 
     matrix.subjectTo.push(equalEquation);
 
-    return matrix
+    return {matrix, glpkInstance};
+}
+
+function noRelevantEquation(subject){
+    let filteredSubject = subject.vars.filter(variable => {
+        if(variable.coef != 0) return true;
+    })
+
+    return (Array.isArray(filteredSubject) && filteredSubject.length !== 0)
 }
 
 export default buildMatrix

@@ -1,9 +1,9 @@
 function getPAC(TS){
     switch (TS) {
         case -11:
-            return 280;
+            return {PAClb: 280, PACub: 299};
         case -18:
-            return 410
+            return {PAClb: 400, PACub: 419} 
     }
 }
 

@@ -18,8 +18,11 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
 
         const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid}});
 
-        let matrix = buildMatrix(fullIngredients, req.body);
+        let {matrix, glpkInstance} = await buildMatrix(fullIngredients, req.body);
 
+        let result = glpkInstance.solve(matrix);
+        //console.log(result);
+        res.status(200).send(JSON.stringify({matrix, result}))
         // import glpk from 'glpk.js';
 
 // async function solveSystem() {
@@ -58,9 +61,6 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
 // }
 
 // solveSystem();
-
-
-        console.log(finalSolution)
 
     } catch(err){
         res.status(400).send(err)

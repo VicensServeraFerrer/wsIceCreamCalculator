@@ -56,8 +56,6 @@ const sugarDTOSchema = Type.Object(
         }),
         POD: Type.Number({
             errorMessage: "El poder edulcorante tiene que ser un numero",
-            minimum: 0,
-            maximum: 100
         }),
         PAC: Type.Number({
             errorMessage: "El poder anticongelante tiene que ser un numero",
@@ -396,7 +394,7 @@ const genericDTOSchema = Type.Object(
         })
     },
     {
-        additionalProperties: false,
+        additionalProperties: true,
         errorMessage: {
             additionalProperties: "El formato del objeto no es vàlido"
         }
