@@ -4,7 +4,6 @@ import authByToken from '../helpers/authByToken.js';
 import validateCreateRecipeByCalculatorDTO from '../dto/validateCreateRecipeByCalculatorDTO.js';
 import buildMatrix from '../helpers/buildMatrix.js';
 import getPAC from '../helpers/getPAC.js';
-import * as math from 'mathjs'
 import validateInsertRecipeDTO from '../dto/validateInsertRecipeDTO.js';
 
 const recipeRouter = express.Router();
