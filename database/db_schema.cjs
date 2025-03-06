@@ -47,7 +47,7 @@ const Recipe = sequelize.define('Recipe', {
     MGTotal: { type: DataTypes.INTEGER },
     STTotal: { type: DataTypes.INTEGER },
     LPDTotal: { type: DataTypes.INTEGER },
-    percentCacao: { type: DataTypes.FLOAT },
+    percentCocoa: { type: DataTypes.FLOAT },
     TS: { type: DataTypes.INTEGER },
     price: { type: DataTypes.FLOAT },
 });

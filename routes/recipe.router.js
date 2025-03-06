@@ -5,9 +5,52 @@ import validateCreateRecipeByCalculatorDTO from '../dto/validateCreateRecipeByCa
 import buildMatrix from '../helpers/buildMatrix.js';
 import getPAC from '../helpers/getPAC.js';
 import * as math from 'mathjs'
+import validateInsertRecipeDTO from '../dto/validateInsertRecipeDTO.js';
 
 const recipeRouter = express.Router();
 const { Recipe, Ingredient } = db
+
+recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, res) => {
+    const { name, description, familyId, TS, ingredients } = req.body;
+
+    let newRecipe = {
+        "name": name,
+        "description": description,
+        "userId": req.jwtData.payload.uuid,
+        "PACTotal": 0,
+        "PODTotal": 0,
+        "MGTotal": 0,
+        "STTotal": 0,
+        "LPDTotal": 0,
+        "percentCocoa": 0,
+        "TS": TS,
+        "price": 0
+    }
+
+    if(familyId) newRecipe["familyId"] = familyId;
+
+    const propertiesToEvaluate = ["PAC", "POD", "MG", "ST", "LPD", "percentCacao"];
+    const recipeProperties =  ["PACTotal", "PODTotal", "MGTotal", "STTotal", "LPDTotal", "percentCocoa"];
+
+    try {
+        const ingredientIds = ingredients.map(ing => ing.id);
+        const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid }})
+
+        propertiesToEvaluate.forEach((property, index) => {
+            fullIngredients.forEach(ingredient => {
+                newRecipe[recipeProperties[index]] += ingredient[property]/100 * ingredients.find(ing => ing.id == ingredient.ingredientId).quantity;
+            })
+        })
+
+        const insertedRecipe = await Recipe.create(newRecipe);
+
+        return res.status(200).send(insertedRecipe);
+    } catch (err){
+        return res.status(400).send(err)
+    }
+    
+
+})
 
 recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO, async (req, res) => {
     const { ingredients } = req.body;
