@@ -9,6 +9,28 @@ import validateInsertRecipeDTO from '../dto/validateInsertRecipeDTO.js';
 const recipeRouter = express.Router();
 const { Recipe, Ingredient } = db
 
+recipeRouter.get("/getAll", authByToken, async (req, res) => {
+    try {
+        const recipes = await Recipe.findAll({where: {"userId": req.jwtData.payload.uuid}, order: [['familyId', 'ASC']]});
+
+        res.status(200).send(recipes);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+recipeRouter.get("/get/:familyId", authByToken, async (req, res) => {
+    const familyId = req.params.familyId;
+
+    try {
+        const recipes = await Recipe.findAll({where: {"userId": req.jwtData.payload.uuid, "familyId": familyId}});
+
+        res.status(200).send(recipes);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
 recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, res) => {
     const { name, description, familyId, TS, ingredients } = req.body;
 
