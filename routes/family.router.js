@@ -7,7 +7,7 @@ import validateAsociationFamRecipeDTO from '../dto/validateAsociationFamRecipeDT
 const familyRouter = express.Router();
 const { Recipe, Family } = db
 
-familyRouter.post("/addIngredient", authByToken, validateAsociationFamRecipeDTO, async (req, res) => {
+familyRouter.post("/addRecipe", authByToken, validateAsociationFamRecipeDTO, async (req, res) => {
     const {recipeId, familyId} = req.body;
 
     try{
@@ -16,6 +16,8 @@ familyRouter.post("/addIngredient", authByToken, validateAsociationFamRecipeDTO,
         const [affectedCount, affectedRows] = await Recipe.update(recipeToModify, {where: {"familyId": familyId}, returning: true})
 
         if(affectedCount == 0) return res.status(200).send("No se modificó ningun elemento")
+
+        return res.status(200).send(affectedRows)
     } catch (err) {
         res.status(400).send(err)
     }
