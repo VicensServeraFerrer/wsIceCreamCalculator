@@ -1,13 +1,41 @@
 import express from 'express';
-import db from '../database/db_schema.cjs';
+import db, { IngredientRecipe } from '../database/db_schema.cjs';
 import authByToken from '../helpers/authByToken.js';
 import validateCreateRecipeByCalculatorDTO from '../dto/validateCreateRecipeByCalculatorDTO.js';
 import buildMatrix from '../helpers/buildMatrix.js';
 import getPAC from '../helpers/getPAC.js';
 import validateInsertRecipeDTO from '../dto/validateInsertRecipeDTO.js';
+import validateModifyRecipeDTO from '../dto/validateModifyRecipeDTO.js';
 
 const recipeRouter = express.Router();
 const { Recipe, Ingredient } = db
+
+recipeRouter.get("/get/:recipeId", authByToken, async (req, res) => {
+    const recipeId = req.params;
+
+    try {
+        const recipe = await Recipe.findOne({where: {"userId" : req.jwtData.payload.uuid, "id": recipeId}})
+
+        if(!recipe) return res.status(400).send("This recipe doesnt exist");
+
+        const ingredients = await IngredientRecipe.findAll({where: {"recipeId": recipeId}});
+
+        recipe[ingredients] = [];
+
+        ingredients.forEach( async ingredient => {
+            const fullIngredient = await Ingredient.findOne({where: {"ingredientId": ingredient.ingredientId}});
+
+            recipe.ingredients.push({
+                quantity: ingredient.quantity,
+                "ingredient": fullIngredient
+            })
+        });
+
+        res.status(200).send(JSON.stringify(recipe));
+    } catch (err) {
+        res.status(400).send(err)
+    }
+})
 
 recipeRouter.get("/getAll", authByToken, async (req, res) => {
     try {
@@ -69,8 +97,11 @@ recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, r
     } catch (err){
         return res.status(400).send(err)
     }
-    
 
+})
+
+recipeRouter.post("/modify", authByToken, validateModifyRecipeDTO, async (req, res) => {
+    //TODO
 })
 
 recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO, async (req, res) => {
