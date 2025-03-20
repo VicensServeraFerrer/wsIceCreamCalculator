@@ -12,10 +12,10 @@ const modifyRecipeDTOSchema = Type.Object(
         }),
         ingredients: Type.Array(
             Type.Object({
-                ingredientId: Type.Number({
+                id: Type.Number({
                 errorMessage: "La id del ingrediente tiene que ser un numero"
             }),
-                newQuantity: Type.Number({
+                quantity: Type.Number({
                     errorMessage: "La cantidad del ingrediente tiene que ser un numero"
                 })
             }),
