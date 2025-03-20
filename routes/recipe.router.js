@@ -66,6 +66,7 @@ recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, r
         "name": name,
         "description": description,
         "userId": req.jwtData.payload.uuid,
+        "familyId": familyId ? familyId : null,
         "PACTotal": 0,
         "PODTotal": 0,
         "MGTotal": 0,
@@ -76,9 +77,7 @@ recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, r
         "price": 0
     }
 
-    if(familyId) newRecipe["familyId"] = familyId;
-
-    const propertiesToEvaluate = ["PAC", "POD", "MG", "ST", "LPD", "percentCacao"];
+    const propertiesToEvaluate = ["PAC", "POD", "MG", "ST", "LPD", "percentCocoa"];
     const recipeProperties =  ["PACTotal", "PODTotal", "MGTotal", "STTotal", "LPDTotal", "percentCocoa"];
 
     try {
@@ -87,11 +86,22 @@ recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, r
 
         propertiesToEvaluate.forEach((property, index) => {
             fullIngredients.forEach(ingredient => {
-                newRecipe[recipeProperties[index]] += ingredient[property]/100 * ingredients.find(ing => ing.id == ingredient.ingredientId).quantity;
+                newRecipe[recipeProperties[index]] +=   ingredient[property] ? 
+                                                        ingredient[property]/100 * ingredients.find(ing => ing.id == ingredient.ingredientId).quantity : 0;
             })
         })
 
         const insertedRecipe = await Recipe.create(newRecipe);
+
+        ingredients.forEach(async ingredient => {
+            const newIngredientRecipe = {
+                "ingredientId": ingredient.id,
+                "recipeId": insertedRecipe.id,
+                "quantity": ingredient.quantity 
+            }
+
+            await IngredientRecipe.create(newIngredientRecipe)
+        })
 
         return res.status(200).send(insertedRecipe);
     } catch (err){
@@ -126,6 +136,8 @@ recipeRouter.post("/modify", authByToken, validateModifyRecipeDTO, async (req, r
 
         const ingredientsModified = await IngredientRecipe.findAll({where: {"recipeId": recipeId}});
 
+        console.log(ingredientsModified)
+
         const ingredientIds = ingredientsModified.map(ing => ing.ingredientId);
         
         const ingredientData = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid }});
@@ -144,15 +156,18 @@ recipeRouter.post("/modify", authByToken, validateModifyRecipeDTO, async (req, r
             "TS":  recipeToRecalculate.TS,
             "price": 0
         }
-    
-        const propertiesToEvaluate = ["PAC", "POD", "MG", "ST", "LPD", "percentCacao"];
+
+        const propertiesToEvaluate = ["PAC", "POD", "MG", "ST", "LPD", "percentCocoa"];
         const recipeProperties =  ["PACTotal", "PODTotal", "MGTotal", "STTotal", "LPDTotal", "percentCocoa"];
 
         propertiesToEvaluate.forEach((property, index) => {
             ingredientData.forEach(ingredient => {
-                newRecipe[recipeProperties[index]] += ingredient[property]/100 * ingredientsModified.find(ing => ing.id == ingredient.ingredientId).quantity;
+                newRecipe[recipeProperties[index]] += ingredient[property] ? 
+                                                        ingredient[property]/100 * ingredientsModified.find(ing => ing.ingredientId == ingredient.ingredientId).quantity : 0;
             })
         });
+
+        console.log(newRecipe);
 
         const [affectedCount, affectedRows] = await Recipe.update(newRecipe, {where: {"id": recipeId, "userId": req.jwtData.payload.uuid }})
 
