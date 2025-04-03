@@ -1,14 +1,13 @@
 import express from 'express';
-import db, { IngredientRecipe } from '../database/db_schema.cjs';
+import db from '../database/db_schema.cjs';
 import authByToken from '../helpers/authByToken.js';
 import validateCreateRecipeByCalculatorDTO from '../dto/validateCreateRecipeByCalculatorDTO.js';
 import buildMatrix from '../helpers/buildMatrix.js';
-import getPAC from '../helpers/getPAC.js';
 import validateInsertRecipeDTO from '../dto/validateInsertRecipeDTO.js';
 import validateModifyRecipeDTO from '../dto/validateModifyRecipeDTO.js';
 
 const recipeRouter = express.Router();
-const { Recipe, Ingredient } = db
+const { Recipe, Ingredient, User, UserRelation, IngredientRecipe } = db
 
 recipeRouter.get("/get/:recipeId", authByToken, async (req, res) => {
     const recipeId = req.params;
@@ -39,9 +38,22 @@ recipeRouter.get("/get/:recipeId", authByToken, async (req, res) => {
 
 recipeRouter.get("/getAll", authByToken, async (req, res) => {
     try {
-        const recipes = await Recipe.findAll({where: {"userId": req.jwtData.payload.uuid}, order: [['familyId', 'ASC']]});
+        const userReq = await User.findOne({where: {"uuid": req.jwtData.payload.uuid}});
 
-        res.status(200).send(recipes);
+        if(userReq.userType == 2){
+            const recipes = await Recipe.findAll({where: {"userId": req.jwtData.payload.uuid}, order: [['familyId', 'ASC']]});
+            
+            return res.status(200).send(recipes);
+        } else {
+            const userIdsRelated = await UserRelation.findAll({where: {"tUserId": req.jwtData.payload.uuid}});
+
+            const userIds = userIdsRelated.map(usr => usr.gUserId);
+            userIds.push(req.jwtData.payload.uuid);
+
+            const recipes = await Recipe.findAll({where: {"userId": userIds}, order: [['userId', 'ASC']]});
+
+            return res.status(200).send(recipes);
+        }
     } catch (err) {
         res.status(400).send(err);
     }
@@ -189,50 +201,9 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
 
         const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid}});
 
-        let {matrix, glpkInstance} = await buildMatrix(fullIngredients, req.body);
+        let { matrixA, matrixB } = await buildMatrix(fullIngredients, req.body);
 
-        let result = glpkInstance.solve(matrix);
-        //console.log(result);
-        res.status(200).send(JSON.stringify({matrix, result}))
-        // import glpk from 'glpk.js';
-
-// async function solveSystem() {
-//     const glpkInstance = await glpk();
-//
-//     let model = {
-//         name: "Sistema de Ingredientes",
-//         objective: {
-//             direction: glpkInstance.GLP_MIN, // Minimizar errores (puedes cambiarlo si quieres otra optimización)
-//             name: "obj",
-//             vars: [
-//                 { name: "x1", coef: 1 },
-//                 { name: "x2", coef: 1 },
-//                 { name: "x3", coef: 1 }
-//             ]
-//         },
-//         subjectTo: [
-//             { name: "eq1", vars: [{ name: "x1", coef: 100 }, { name: "x2", coef: 5 }, { name: "x3", coef: 4 }], bnds: { type: glpkInstance.GLP_FX, ub: 280, lb: 280 } },
-//             { name: "eq2", vars: [{ name: "x1", coef: 100 }, { name: "x2", coef: 5 }, { name: "x3", coef: 0 }], bnds: { type: glpkInstance.GLP_FX, ub: 180, lb: 180 } },
-//             { name: "eq3", vars: [{ name: "x1", coef: 0 }, { name: "x2", coef: 0 }, { name: "x3", coef: 3.6 }], bnds: { type: glpkInstance.GLP_FX, ub: 100, lb: 100 } },
-//             { name: "eq4", vars: [{ name: "x1", coef: 100 }, { name: "x2", coef: 0 }, { name: "x3", coef: 12 }], bnds: { type: glpkInstance.GLP_FX, ub: 40, lb: 40 } },
-//             { name: "eq5", vars: [{ name: "x1", coef: 0 }, { name: "x2", coef: 0 }, { name: "x3", coef: 8.4 }], bnds: { type: glpkInstance.GLP_FX, ub: 80, lb: 80 } },
-//             { name: "suma1000", vars: [{ name: "x1", coef: 1 }, { name: "x2", coef: 1 }, { name: "x3", coef: 1 }], bnds: { type: glpkInstance.GLP_FX, ub: 1000, lb: 1000 } }
-//         ],
-//         bounds: [
-//             { name: "x1", type: glpkInstance.GLP_LO, lb: 0 }, // Ingredientes no pueden ser negativos
-//             { name: "x2", type: glpkInstance.GLP_LO, lb: 0 },
-//             { name: "x3", type: glpkInstance.GLP_LO, lb: 0 }
-//         ],
-//         generals: ["x1", "x2", "x3"] // Si quieres solo valores enteros
-//     };
-
-//     let result = glpkInstance.solve(model);
-//     console.log("Solución óptima:", result.result.status);
-//     console.log("Valores de las variables:", result.result.vars);
-// }
-
-// solveSystem();
-
+        res.status(200).send(JSON.stringify({matrix, result}));
     } catch(err){
         res.status(400).send(err)
     }

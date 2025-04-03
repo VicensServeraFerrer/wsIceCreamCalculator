@@ -29,6 +29,10 @@ const User = sequelize.define('User', {
     userType: { type: DataTypes.INTEGER, allowNull: false, references: { model: UserType, key: 'id' } },
 });
 
+const UserRelation = sequelize.define("UserRelation", {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
+})
+
 const Family = sequelize.define('Family', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     userId: { type: DataTypes.UUID, allowNull: false, references: { model: User, key: 'uuid' } },  // Actualizar a UUID
@@ -114,6 +118,8 @@ UserType.hasMany(User, { foreignKey: 'userType' });
 User.hasMany(Family, { foreignKey: 'userId' });
 User.hasMany(Ingredient, { foreignKey: 'userId' });
 User.hasMany(Recipe, { foreignKey: 'userId' });
+User.belongsToMany(User, {as: "TUsers", through: UserRelation, foreignKey: "tUserId", otherKey: "gUserId"});
+User.belongsToMany(User, {as: "GUsers", through: UserRelation, foreignKey: "gUserId", otherKey: "tUserId"});
 Family.hasMany(Recipe, { foreignKey: 'familyId' });
 Type.hasMany(Ingredient, {foreignKey: 'ingredientType'});
 Recipe.belongsToMany(Ingredient, { through: IngredientRecipe, foreignKey: 'recipeId' });
@@ -138,6 +144,7 @@ module.exports = {
     sequelize,
     UserType,
     User,
+    UserRelation,
     Family,
     Recipe,
     Ingredient,

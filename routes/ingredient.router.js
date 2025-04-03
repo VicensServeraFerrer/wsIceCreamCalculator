@@ -18,26 +18,29 @@ ingredientRouter.get("/get/:name", authByToken, async (req, res) => {
 })
 
 ingredientRouter.get("/getAll", authByToken, async (req, res) => {
-    const ingredients = await Ingredient.findAll({where: { "userId": req.jwtData.payload.uuid }})
+    const userReq = await User.findOne({where: {"uuid": req.jwtData.payload.uuid}});
 
-    if(!ingredients) return res.status(200).send(JSON.stringify({message: "No hay ingredientes de este tipo"}));
+    let userIds = [];
+    if(userReq.userType != 2){
+        const userIdsRelated = await UserRelation.findAll({where: {"tUserId": req.jwtData.payload.uuid}});
 
-    const groupedIngredients = {}
+        userIds = userIdsRelated.map(usr => usr.gUserId);
+        
+    }
+    userIds.push(req.jwtData.payload.uuid);
+
+    const ingredients = await Ingredient.findAll({where: { "userId": userIds },
+            include: [{
+                model: Type,
+                attributes: ["id"]
+            }], 
+            order: [[Type, "id", "ASC"]]
+        });
+        if(!ingredients) return res.status(200).send(JSON.stringify({message: "No hay ingredientes de este tipo"}));
+
+        return res.status(200).send(JSON.stringify({ingredients}))
     
-    await Promise.all(
-        ingredients.map(async (ingredient) => {
-            const ingredientType = await Type.findOne({where: {"id": ingredient.ingredientType}}) 
-            const ingredientTypeName = ingredientType.name
-
-            if (!groupedIngredients[ingredientTypeName]) {
-                groupedIngredients[ingredientTypeName] = [];
-            }
     
-            groupedIngredients[ingredientTypeName].push(ingredient);
-            })
-        );
-
-    return res.status(200).send(JSON.stringify({groupedIngredients}))
 });
 
 ingredientRouter.get("/getAll/:ingredientType", authByToken, async (req, res) => {

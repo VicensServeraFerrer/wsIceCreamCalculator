@@ -1,92 +1,77 @@
-// let matrix = {
-//     PAC: [],
-//     POD: [],
-//     MG: [],
-//     ST: [],
-//     LPD: [],
-//     percentCocoa: []
-// }
-import glpk from "glpk.js"
+const matrix = {
+    PAC: [],
+    POD: [],
+    MG: [],
+    ST: [],
+    LPD: [],
+    percentCocoa: []
+}
+
 import getPAC from "./getPAC.js";
 
-async function initializeMatrix(){
-    const glpkInstance = await glpk();
-
-    let matrix = {
-        name: "",
-        objective: {
-            direction: glpkInstance.GLP_MIN,
-            name: "obj",
-            vars: []
-        },
-        subjectTo: [
-            { name: "PAC", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 1000, lb: 0 } },
-            { name: "POD", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 1000, lb: 0 } },
-            { name: "MG", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 1000, lb: 0 } },
-            { name: "ST", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 1000, lb: 0 } },
-            { name: "LPD", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 1000, lb: 0 } },
-            { name: "percentCocoa", vars: [], bnds: { type: glpkInstance.GLP_FX, ub: 1000, lb: 0 } },
-        ], 
-        bounds: [
-            
-        ],
-    }
-
-    return {matrix, glpkInstance};
-}
-
 async function buildMatrix(ingredients, bounds){
-    let {matrix, glpkInstance} = await initializeMatrix();
+    const matrixA = matrix;
+    const matrixB = matrix;
 
-    console.log(matrix);
-    matrix.subjectTo.forEach(subject => {
-        if(subject.name == 'PAC') {
-            const {PAClb, PACub} = getPAC(bounds.TS);
+    const keyNames = Object.keys(matrix);
 
-            subject.bnds.ub = PACub;
-            subject.bnds.lb = PAClb;
+    keyNames.forEach(key => {
+        if(key == 'PAC'){
+            const PAC = getPAC(bounds.TS);
+            matrixB[key].push(PAC.PACub);
         } else {
-            subject.bnds.ub = bounds[subject.name] ? bounds[subject.name] : 0;
-            subject.bnds.lb = bounds[subject.name] ? 0 : 0;
+            matrixB[key].push(bounds[key]);
         }
-        
 
         ingredients.forEach(ingredient => {
-            const ingredientVariable = {name: ingredient.dataValues.name, coef: ingredient.dataValues[subject.name] ? ingredient.dataValues[subject.name]/100 : 0}
-
-            subject.vars.push(ingredientVariable);
+            matrixA[key].push(ingredient.dataValues[key] ? ingredient.dataValues[key]/100 : 0);
         })
     })
+ 
+    return { matrixA, matrixB }; 
+    // let {matrix, glpkInstance} = await initializeMatrix();
 
-    matrix.subjectTo = matrix.subjectTo.filter(subject => noRelevantEquation(subject));
-    
-    matrix.subjectTo.forEach(subject => {
-        subject.vars = subject.vars.filter(variable => {
-            return variable.coef != 0;
-        })
-    })
-    
-    let equalEquation = { name: "sum1000", vars: [], bnds: {type: glpkInstance.GLP_FX, ub: 1000, lb: 1000}}
-    ingredients.forEach(ingredient => {
-        const ingredientVariable = {name: ingredient.dataValues.name, coef: 1}
-        const ingredientBound = { name: ingredient.dataValues.name, type: glpkInstance.GLP_LO, lb: 0}
+    // console.log(matrix);
+    // matrix.subjectTo.forEach(subject => {
+    //     if(subject.name == 'PAC') {
+    //         const {PAClb, PACub} = getPAC(bounds.TS);
+
+    //         subject.bnds.ub = PACub;
+    //         subject.bnds.lb = PAClb;
+    //     } else {
+    //         subject.bnds.ub = bounds[subject.name] ? bounds[subject.name] : 0;
+    //         subject.bnds.lb = bounds[subject.name] ? 0 : 0;
+    //     }
         
-        matrix.objective.vars.push(ingredient.dataValues.name);
-        matrix.bounds.push(ingredientBound);
-        equalEquation.vars.push(ingredientVariable);
-    });
 
-    matrix.subjectTo.push(equalEquation);
+    //     ingredients.forEach(ingredient => {
+    //         const ingredientVariable = {name: ingredient.dataValues.name, coef: ingredient.dataValues[subject.name] ? ingredient.dataValues[subject.name]/100 : 0}
 
-    return {matrix, glpkInstance};
-}
+    //         subject.vars.push(ingredientVariable);
+    //     })
+    // })
 
-function noRelevantEquation(subject){
-    let filteredSubject = subject.vars.filter(variable => {
-        if(variable.coef != 0) return true;
-    })
+    // matrix.subjectTo = matrix.subjectTo.filter(subject => noRelevantEquation(subject));
+    
+    // matrix.subjectTo.forEach(subject => {
+    //     subject.vars = subject.vars.filter(variable => {
+    //         return variable.coef != 0;
+    //     })
+    // })
+    
+    // let equalEquation = { name: "sum1000", vars: [], bnds: {type: glpkInstance.GLP_FX, ub: 1000, lb: 1000}}
+    // ingredients.forEach(ingredient => {
+    //     const ingredientVariable = {name: ingredient.dataValues.name, coef: 1}
+    //     const ingredientBound = { name: ingredient.dataValues.name, type: glpkInstance.GLP_LO, lb: 0}
+        
+    //     matrix.objective.vars.push(ingredient.dataValues.name);
+    //     matrix.bounds.push(ingredientBound);
+    //     equalEquation.vars.push(ingredientVariable);
+    // });
 
-    return (Array.isArray(filteredSubject) && filteredSubject.length !== 0)
+    // matrix.subjectTo.push(equalEquation);
+
+    // return {matrix, glpkInstance};
 }
 
 export default buildMatrix
