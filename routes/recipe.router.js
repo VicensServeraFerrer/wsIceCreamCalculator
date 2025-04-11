@@ -122,7 +122,7 @@ recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, r
         return res.status(400).send(err)
     }
 
-})
+});
 
 recipeRouter.post("/modify", authByToken, validateModifyRecipeDTO, async (req, res) => {
     const { recipeId, ingredients } = req.body;
@@ -195,22 +195,20 @@ recipeRouter.post("/modify", authByToken, validateModifyRecipeDTO, async (req, r
 })
 
 recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO, async (req, res) => {
-    console.log("llego aqui!!!!!!!!!!!!!!!")
-    const { ingredients } = req.body;
-
+    const { name, description, familyId, TS, ingredients } = req.body;
     
     try {
         
         const ingredientIds = ingredients.map(ing => ing.id);
 
-        const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid}});
+        const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds}});
 
-        let { matrixA, matrixB, ingredientNames } = await buildMatrix(fullIngredients, req.body);
+        let { matrixA, matrixB, orderedIngIds } = await buildMatrix(fullIngredients, req.body);
         
         const parameters_py = {
                     "matrixA": Object.values(matrixA),
                     "matrixB": Object.values(matrixB).flat(),
-                    "ingredientNames": ingredientNames
+                    "ingredientIds": orderedIngIds
         }
 
         const python = spawn('python3', ['../TFG/helpers/solver.py']);
@@ -233,15 +231,18 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
             if (code !== 0) {
                 console.error("❌ Hubo un error en la ejecución del script Python");
             } else {
-                console.log("✅ Python se ejecutó correctamente");
-                console.log(matrixA); 
-                res.json(JSON.parse(output)); // solo si todo fue bien
+                const calculatedRecipe = JSON.parse(output)
+                const fullRecipe = {
+                    "name": name,
+                    "description": description,
+                    "familyId": familyId ? familyId : null,
+                    "TS": TS,
+                    "ingredients": calculatedRecipe
+                }
+                return res.status(200).send(JSON.stringify(fullRecipe));
             }
         });
 
-
-
-        //res.status(200).send(output);//JSON.stringify(parameters_py));
     } catch(err){
         res.status(400).send(err)
     }

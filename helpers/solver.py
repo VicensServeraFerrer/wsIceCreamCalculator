@@ -10,7 +10,7 @@ def main():
     # Extraer matrices desde JSON
     A = np.array(data.get("matrixA", []))
     B = np.array(data.get("matrixB", []))
-    ingredient_names = data.get("ingredientNames", [])
+    ingredient_ids = data.get("ingredientIds", [])
     
     # Verificar que las matrices no estén vacías
     if A.size == 0 or B.size == 0:
@@ -29,8 +29,8 @@ def main():
     res = lsq_linear(A, B, bounds=(lower_bounds, upper_bounds))  # Se pueden añadir bounds=[min, max]
     
     result = [
-        {"nombre": nombre, "valor": round(valor, 4)}
-        for nombre, valor in zip(ingredient_names, res.x)
+        {"id": id, "quantity": round(valor, 4)}
+        for id, valor in zip(ingredient_ids, res.x)
     ]
 
     # Construir la respuesta JSON
