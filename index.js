@@ -11,7 +11,7 @@ import familyRouter from './routes/family.router.js';
 dotenv.config();
 
 const PORT =  3000;
-const expressApp = express()
+const expressApp = express();
 
 expressApp.use(express.json());
 expressApp.use(express.text());

@@ -1,4 +1,5 @@
 import express from 'express';
+import child_process from 'child_process';
 import db from '../database/db_schema.cjs';
 import authByToken from '../helpers/authByToken.js';
 import validateCreateRecipeByCalculatorDTO from '../dto/validateCreateRecipeByCalculatorDTO.js';
@@ -8,6 +9,7 @@ import validateModifyRecipeDTO from '../dto/validateModifyRecipeDTO.js';
 
 const recipeRouter = express.Router();
 const { Recipe, Ingredient, User, UserRelation, IngredientRecipe } = db
+const { spawn } = child_process;
 
 recipeRouter.get("/get/:recipeId", authByToken, async (req, res) => {
     const recipeId = req.params;
@@ -193,17 +195,53 @@ recipeRouter.post("/modify", authByToken, validateModifyRecipeDTO, async (req, r
 })
 
 recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO, async (req, res) => {
+    console.log("llego aqui!!!!!!!!!!!!!!!")
     const { ingredients } = req.body;
 
     
     try {
+        
         const ingredientIds = ingredients.map(ing => ing.id);
 
         const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds, "userId": req.jwtData.payload.uuid}});
 
-        let { matrixA, matrixB } = await buildMatrix(fullIngredients, req.body);
+        let { matrixA, matrixB, ingredientNames } = await buildMatrix(fullIngredients, req.body);
+        
+        const parameters_py = {
+                    "matrixA": Object.values(matrixA),
+                    "matrixB": Object.values(matrixB).flat(),
+                    "ingredientNames": ingredientNames
+        }
 
-        res.status(200).send(JSON.stringify({matrix, result}));
+        const python = spawn('python3', ['../TFG/helpers/solver.py']);
+        
+        python.stdin.write(JSON.stringify(parameters_py));
+        
+        python.stdin.end();
+
+        let output = "";
+        python.stdout.on("data", (data) => {
+            output += data.toString();
+        });
+
+        python.stderr.on("data", (data) => {
+            console.error(`🐍 Error desde Python: ${data.toString()}`);
+        });
+
+        python.on("close", (code) => {
+            console.log(`🔍 Python finalizó con código ${code}`);
+            if (code !== 0) {
+                console.error("❌ Hubo un error en la ejecución del script Python");
+            } else {
+                console.log("✅ Python se ejecutó correctamente");
+                console.log(matrixA); 
+                res.json(JSON.parse(output)); // solo si todo fue bien
+            }
+        });
+
+
+
+        //res.status(200).send(output);//JSON.stringify(parameters_py));
     } catch(err){
         res.status(400).send(err)
     }

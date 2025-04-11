@@ -1,19 +1,26 @@
-const matrix = {
-    PAC: [],
-    POD: [],
-    MG: [],
-    ST: [],
-    LPD: [],
-    percentCocoa: []
-}
-
 import getPAC from "./getPAC.js";
 
 async function buildMatrix(ingredients, bounds){
-    const matrixA = matrix;
-    const matrixB = matrix;
+    const matrixA = {
+        PAC: [],
+        POD: [],
+        MG: [],
+        ST: [],
+        LPD: [],
+        percentCocoa: []
+    }
+    
+    const matrixB = {
+        PAC: [],
+        POD: [],
+        MG: [],
+        ST: [],
+        LPD: [],
+        percentCocoa: []
+    }
 
-    const keyNames = Object.keys(matrix);
+    const keyNames = Object.keys(matrixA);
+    const ingredientNames = [];
 
     keyNames.forEach(key => {
         if(key == 'PAC'){
@@ -25,10 +32,15 @@ async function buildMatrix(ingredients, bounds){
 
         ingredients.forEach(ingredient => {
             matrixA[key].push(ingredient.dataValues[key] ? ingredient.dataValues[key]/100 : 0);
+            if(!ingredientNames.includes(ingredient.dataValues.name)) ingredientNames.push(ingredient.dataValues.name);
         })
     })
  
-    return { matrixA, matrixB }; 
+    return { 
+            "matrixA": matrixA, 
+            "matrixB": matrixB,
+            "ingredientNames": ingredientNames
+         }; 
     // let {matrix, glpkInstance} = await initializeMatrix();
 
     // console.log(matrix);
