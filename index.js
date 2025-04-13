@@ -13,6 +13,8 @@ dotenv.config();
 const PORT =  3000;
 const expressApp = express();
 
+expressApp.use(express.static('UI'));
+
 expressApp.use(express.json());
 expressApp.use(express.text());
 expressApp.use("/user", userRouter);
