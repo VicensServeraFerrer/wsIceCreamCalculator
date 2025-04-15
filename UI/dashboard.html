@@ -25,22 +25,27 @@
     
     <!-- Área de contenido principal -->
     <main class="main-content">
-      <!-- (Opcional) Contenido por defecto oculto, si no deseas superponerlo con los botones -->
+      <!-- Vista por defecto -->
       <div class="default-content">
         <h1>Bienvenido a Gelato Calculator</h1>
         <p>Selecciona una opción del menú para comenzar.</p>
       </div>
       
-      <!-- Panel de acciones con los botones (Alta, Búsqueda y Calcular) -->
+      <!-- Contenedor para cargar vistas dinámicas (vacío por defecto) -->
+      <div id="dynamicView" style="display: none;"></div>
+      
+      <!-- Panel de acciones: botones grandes (Alta, Búsqueda y Calcular) -->
       <div class="action-panel" id="actionPanel">
         <button id="btnAlta" class="action-button alta-button">Alta</button>
         <button id="btnBusqueda" class="action-button busqueda-button">Búsqueda</button>
-        <!-- Botón “Calcular”, visible solo al seleccionar “Recetas” -->
-        <button id="btnCalcular" class="action-button calcular-button" style="display:none;">Calcular</button>
+        <!-- Botón "Calcular", visible solo al seleccionar "Recetas" -->
+        <button id="btnCalcular" class="action-button calcular-button" style="display: none;">Calcular</button>
       </div>
     </main>
   </div>
 
   <script src="dashboard.js"></script>
+  <script src="JS/providerAltaModule.js"></script>
+  <script src="JS/ingredientAltaModule.js"></script>
 </body>
 </html>

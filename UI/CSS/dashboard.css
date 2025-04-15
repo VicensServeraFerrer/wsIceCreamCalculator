@@ -1,143 +1,132 @@
 /* dashboard.css */
 * {
-    box-sizing: border-box;
-  }
-  
-  body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f9f9f9;
-  }
-  
-  /* Header con logo centrado y perfil a la derecha */
-  header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background-color: #007BFF;
-    color: #fff;
-    padding: 15px 20px;
-    height: 60px;
-  }
-  
-  header .logo {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-  }
-  
-  header .profile {
-    position: absolute;
-    right: 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  /* Contenedor principal: sidebar y contenido */
-  .container {
-    display: flex;
-    height: calc(100vh - 60px); /* Ajustar la altura restando el header */
-  }
-  
-  /* Sidebar lateral izquierdo */
-  .sidebar {
-    width: 200px;
-    background-color: #333;
-    color: #fff;
-    padding-top: 20px;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .sidebar ul li {
-    padding: 15px 20px;
-    cursor: pointer;
-    border-bottom: 1px solid #444;
-    transition: background-color 0.3s;
-  }
-  
-  .sidebar ul li:hover,
-  .sidebar ul li.active {
-    background-color: #555;
-  }
-  
-  /* Área principal del contenido */
-  .main-content {
-    flex-grow: 1;
-    position: relative; /* Permite posicionamiento absoluto del panel de botones */
-    padding: 20px;
-  }
-  
-  /* (Opcional) Ocultar contenido por defecto si molesta la superposición */
-  .default-content {
-    text-align: center;
-    margin-top: 40px;
-    /* display: none;  <-- Descomenta para ocultar si deseas */
-  }
-  
-  /* Panel de acción: se ubica en el centro de main-content */
-  .action-panel {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    
-    /* Mostramos en flex para alinear los botones */
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-  }
-  
-  /* Botones grandes con icono de fondo */
-  .action-button {
-    width: 250px;
-    height: 250px;
-    font-size: 22px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #333;
-    
-    /* Fondo blanco semitransparente */
-    background-color: rgba(255,255,255,0.8);
-    
-    /* Icono de fondo */
-    background-repeat: no-repeat;
-    background-position: center 40%;
-    background-size: 120px 120px;
-    
-    /* Efectos */
-    display: flex;
-    align-items: flex-end;   /* Texto al final del botón */
-    justify-content: center; 
-    padding-bottom: 10px;
-    transition: transform 0.2s;
-  }
-  
-  /* Escala al pasar el ratón */
-  .action-button:hover {
-    transform: scale(1.03);
-  }
-  
-  /* Botón Alta: cono de helado */
-  .alta-button {
-    background-image: url("images/icecream-cone.png");
-  }
-  
-  /* Botón Búsqueda: lupa */
-  .busqueda-button {
-    background-image: url("images/magnifying-glass.png");
-  }
-  
-  /* Botón Calcular: si quieres otro icono, lo pones aquí */
-  .calcular-button {
-     background-image: url("images/calculator.png"); 
-  }
-  
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Header: logo centrado y perfil a la derecha */
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: #007BFF;
+  color: #fff;
+  padding: 15px 20px;
+  height: 60px;
+}
+
+header .logo {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+}
+
+header .profile {
+  position: absolute;
+  right: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Contenedor principal: sidebar y contenido principal */
+.container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* Sidebar (menú lateral izquierdo) */
+.sidebar {
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  padding-top: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  padding: 15px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid #444;
+  transition: background-color 0.3s;
+}
+
+.sidebar ul li:hover,
+.sidebar ul li.active {
+  background-color: #555;
+}
+
+/* Área principal (zona blanca) */
+.main-content {
+  flex-grow: 1;
+  position: relative;
+  padding: 20px;
+}
+
+.default-content {
+  text-align: center;
+  margin-top: 40px;
+}
+
+#dynamicView {
+  display: none;
+}
+
+/* Panel de acción: botones grandes centrados en main-content */
+.action-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.action-button {
+  width: 250px;
+  height: 250px;
+  font-size: 22px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #333;
+  background-color: rgba(255,255,255,0.8);
+  background-repeat: no-repeat;
+  background-position: center 40%;
+  background-size: 120px 120px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+  transition: transform 0.2s;
+}
+
+.action-button:hover {
+  transform: scale(1.03);
+}
+
+.alta-button {
+  background-image: url("images/icecream-cone.png");
+}
+
+.busqueda-button {
+  background-image: url("images/magnifying-glass.png");
+}
+
+.calcular-button {
+  background-color: rgba(255,255,255,0.8);
+}

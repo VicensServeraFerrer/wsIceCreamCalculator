@@ -1,0 +1,108 @@
+/* ingredient.css */
+
+/* Contenedor principal del formulario de alta de ingrediente */
+.ingredient-form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    
+    /* Aumentamos el ancho para aprovechar más espacio */
+    max-width: 900px;  
+    width: 90%;
+    margin: 40px auto;
+    
+    position: relative; /* Para posicionar el botón de forma absoluta */
+    overflow: hidden;
+  }
+  
+  /* Título del formulario */
+  .ingredient-form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Filas de formulario */
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+  
+  /* Fila para los campos fijos (fila 0) */
+  .fixed-fields {
+    justify-content: space-between;
+  }
+  
+  /* Cada campo fijo en la fila 0 */
+  .fixed-field {
+    flex: 1;
+    min-width: 150px;
+    margin-right: 10px;
+  }
+  .fixed-field:last-child {
+    margin-right: 0;
+  }
+  
+  /* Fila para el selector de tipo (fila 1) */
+  .type-selector {
+    justify-content: center;
+  }
+  
+  /* Fila para los campos específicos (fila 2):
+     Se crea una cuadrícula de 4 columnas.
+  */
+  .specific-fields .grid-fields {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+    gap: 15px;
+    justify-items: center;
+  }
+  
+  /* Grupo de formulario general */
+  .form-group {
+    margin-bottom: 10px;
+    flex: 1;
+  }
+  
+  /* Etiquetas */
+  .ingredient-form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  /* Inputs y select */
+  .ingredient-form-container input,
+  .ingredient-form-container select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Botón de envío fijo en la esquina inferior derecha */
+  .fixed-submit-btn {
+    position: absolute;
+    bottom: 10px; /* Ajustamos para que quede más abajo */
+    right: 20px;
+    padding: 12px 20px;
+    background-color: #007BFF;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .fixed-submit-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Mensaje de feedback */
+  #ingredientMessage {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 16px;
+  }
+  
