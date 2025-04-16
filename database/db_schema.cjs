@@ -90,6 +90,7 @@ const IngredientRecipe = sequelize.define('IngredientRecipe', {
 
 const Provider = sequelize.define('Provider', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.UUID, allowNull: false, references: { model: User, key: 'uuid' } },
     name: { type: DataTypes.STRING, allowNull: false },
     tlf: { type: DataTypes.STRING },
     address: { type: DataTypes.STRING },
@@ -118,6 +119,7 @@ UserType.hasMany(User, { foreignKey: 'userType' });
 User.hasMany(Family, { foreignKey: 'userId' });
 User.hasMany(Ingredient, { foreignKey: 'userId' });
 User.hasMany(Recipe, { foreignKey: 'userId' });
+User.hasMany(Provider, { foreignKey: 'userId' });
 User.belongsToMany(User, {as: "TUsers", through: UserRelation, foreignKey: "tUserId", otherKey: "gUserId"});
 User.belongsToMany(User, {as: "GUsers", through: UserRelation, foreignKey: "gUserId", otherKey: "tUserId"});
 Family.hasMany(Recipe, { foreignKey: 'familyId' });

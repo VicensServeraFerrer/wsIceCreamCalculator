@@ -5,7 +5,7 @@ import authByToken from '../helpers/authByToken.js';
 import partialToCompleteIngredientMapper from '../mappers/partialToCompleteIngredient.mapper.js';
 
 const ingredientRouter = express.Router();
-const { Ingredient, Type } = db;
+const { Ingredient, Type, User } = db;
 
 ingredientRouter.get("/get/:name", authByToken, async (req, res) => {
     const { name } = req.params;
@@ -29,12 +29,7 @@ ingredientRouter.get("/getAll", authByToken, async (req, res) => {
     }
     userIds.push(req.jwtData.payload.uuid);
 
-    const ingredients = await Ingredient.findAll({where: { "userId": userIds },
-            include: [{
-                model: Type,
-                attributes: ["id"]
-            }], 
-            order: [[Type, "id", "ASC"]]
+    const ingredients = await Ingredient.findAll({where: { "userId": userIds }
         });
         if(!ingredients) return res.status(200).send(JSON.stringify({message: "No hay ingredientes de este tipo"}));
 

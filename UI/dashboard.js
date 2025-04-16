@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const sidebarItems = document.querySelectorAll('.sidebar ul li');
   const btnCalcular = document.getElementById('btnCalcular');
   const btnAlta = document.getElementById('btnAlta');
+  const btnBusqueda = document.getElementById('btnBusqueda');
   const defaultTitle = document.querySelector('.default-content h1');
   const headerLogo = document.querySelector('.logo');
   
@@ -49,47 +50,78 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Al pulsar el botón "Alta": si el menú activo es "proveedores", se carga el formulario
+  // Acción del botón "Alta" según la sección activa
   btnAlta.addEventListener('click', () => {
     const activeItem = document.querySelector('.sidebar ul li.active');
     if (activeItem) {
       const selection = activeItem.getAttribute('data-section');
-      if(selection === 'proveedores'){
+      if (selection === 'proveedores') {
         showProviderAltaForm();
-      } else if (selection === 'ingredientes'){
-        showIngredientAltaForm()
+      } else if (selection === 'ingredientes') {
+        showIngredientAltaForm();
       }
     }
   });
 
+  // Nueva función para gestionar la acción de búsqueda. searchType puede ser 'proveedores', 'ingredientes' o 'recetas'
+  function showSearchForm(searchType) {
+    // Oculta la vista por defecto y el panel de acciones
+    defaultContent.style.display = 'none';
+    actionPanel.style.display = 'none';
+    
+    // Limpia y muestra el contenedor de vistas dinámicas
+    dynamicView.innerHTML = '';
+    dynamicView.style.display = 'block';
+    
+    switch (searchType) {
+      case 'proveedores':
+        initProviderSearch(dynamicView);
+        break;
+      case 'ingredientes':
+        // Se supone que el módulo ingredientSearchModule.js define globalmente initIngredientSearch
+        initIngredientSearch(dynamicView);
+        break;
+      case 'recetas':
+        console.warn("Búsqueda de recetas aún no implementada.");
+        break;
+      default:
+        console.error("Tipo de búsqueda no soportado:", searchType);
+    }
+  }
+  
+  // Modificamos la acción del botón "Búsqueda" para que dependa del elemento activo
+  btnBusqueda.addEventListener('click', () => {
+    const activeItem = document.querySelector('.sidebar ul li.active');
+    let searchType = 'proveedores'; // valor por defecto
+    if (activeItem) {
+      const section = activeItem.getAttribute('data-section');
+      // Asumimos que si la sección activa es ingredientes o proveedores, se usará el buscador correspondiente.
+      if (section === 'ingredientes') {
+        searchType = 'ingredientes';
+      } else if (section === 'recetas') {
+        searchType = 'recetas';
+      } else if (section === 'proveedores') {
+        searchType = 'proveedores';
+      }
+    }
+    showSearchForm(searchType);
+  });
+
   // Función para cargar la vista de alta de proveedor usando el módulo providerAltaModule.js
   function showProviderAltaForm() {
-    // 1) Oculta la vista por defecto
     defaultContent.style.display = 'none';
-
-    // 2) Oculta el panel de acciones para que no se superponga
     actionPanel.style.display = 'none';
-
-    // 3) Limpia el contenedor de vistas dinámicas y carga la vista de alta mediante initProviderAlta
     dynamicView.innerHTML = '';
     dynamicView.style.display = 'block';
-    // Llama a la función del módulo para inicializar la vista y funcionalidad del alta de proveedor
     initProviderAlta(dynamicView);
-    
   }
 
-  // Función para cargar la vista de alta de proveedor usando el módulo providerAltaModule.js
+  // Función para cargar la vista de alta de ingrediente usando el módulo ingredientAltaModule.js
   function showIngredientAltaForm() {
-    // 1) Oculta la vista por defecto
     defaultContent.style.display = 'none';
-
-    // 2) Oculta el panel de acciones para que no se superponga
     actionPanel.style.display = 'none';
-
-    // 3) Limpia el contenedor de vistas dinámicas y carga la vista de alta mediante initProviderAlta
     dynamicView.innerHTML = '';
     dynamicView.style.display = 'block';
-    // Llama a la función del módulo para inicializar la vista y funcionalidad del alta de proveedor
     initIngredientAlta(dynamicView);
   }
 });

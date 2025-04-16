@@ -1,0 +1,120 @@
+/* ingredientSearch.css */
+
+.ingredient-search-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 900px;
+    margin: 40px auto;
+    position: relative;
+}
+
+.ingredient-search-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-controls select,
+.search-controls input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-controls select {
+    min-width: 150px;
+}
+
+.search-controls input[type="text"] {
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-btn {
+    width: 50px;
+    height: 50px;
+    border: none;
+    background-color: #007BFF;
+    border-radius: 4px;
+    background-image: url("images/magnifying-glass.png");
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+/* Tabla de resultados */
+.ingredient-table-header, .ingredient-table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.5fr 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.ingredient-table-header {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+.ingredient-table-row:hover {
+    background-color: #fafafa;
+}
+
+/* Los detalles se mostrarán debajo de la fila principal */
+.ingredient-details {
+    grid-column: 1 / -1;
+    display: none;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.ingredient-details-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ingredient-details-table td {
+    padding: 5px;
+    border: 1px solid #ddd;
+}
+
+.detail-key {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+.modify-btn {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modify-btn:hover {
+    background-color: #218838;
+}
+
+/* Ajuste para el toggle button: se usa para expandir/contraer detalles */
+.toggle-details-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}

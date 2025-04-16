@@ -29,7 +29,7 @@ const ingredientTypeSelectTemplate = `
     <option value="7">Queso</option>
     <option value="8">Salado</option>
     <option value="9">Alcohol</option>
-    <option value="0">Genérico</option>
+    <option value="10">Genérico</option>
   </select>
 </div>
 `;
@@ -97,7 +97,7 @@ const specificFieldsByType = {
       { id: "grade", label: "Grado de alcohol", type: "number", min: 0, max: 100 },
       { id: "percentsugar", label: "Porcentaje de azúcar", type: "number", min: 0, max: 100 }
   ],
-  "0": [ // Genérico
+  "10": [ // Genérico
       { id: "MG", label: "Materia Grasa Animal", type: "number", min: 0, max: 100 },
       { id: "MGV", label: "Materia Grasa Vegetal", type: "number", min: 0, max: 100 },
       { id: "LPD", label: "Leche en polvo desnatada", type: "number", min: 0, max: 100 },
@@ -185,7 +185,13 @@ function initIngredientAlta(container) {
     for (let i = 0; i < formElements.length; i++) {
       const element = formElements[i];
       if (element.name && element.value) {
-        formData[element.name] = element.type === 'number' ? Number(element.value) : element.value.trim();
+        // Si el campo es el selector de tipo, forzamos que se convierta a número,
+        // ya que su elemento type es "select-one" y no "number"
+        if (element.name === 'ingredientType') {
+          formData[element.name] = Number(element.value);
+        } else {
+          formData[element.name] = element.type === 'number' ? Number(element.value) : element.value.trim();
+        }
       }
     }
 

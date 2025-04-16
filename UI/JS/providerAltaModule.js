@@ -72,7 +72,7 @@ function initProviderAlta(container) {
         providerMessage.style.color = 'red';
       } else {
         const data = await response.json();
-        providerMessage.textContent = 'Proveedor creado exitosamente. ID: ' + data.uuid;
+        providerMessage.textContent = 'Proveedor creado exitosamente. ID: ' + data.id;
         providerMessage.style.color = 'green';
         providerForm.reset();
       }

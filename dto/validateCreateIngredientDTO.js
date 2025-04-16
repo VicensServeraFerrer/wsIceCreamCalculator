@@ -10,7 +10,7 @@ function validateCreateIngredientDTO(req, res, next) {
 
     const { ingredientType } = req.body;
 
-    if(!ingredientType) return res.status(400).send("No hay un campo tipo de ingrediente")
+    if(ingredientType === undefined) return res.status(400).send("No hay un campo tipo de ingrediente")
 
     let validate;
     switch(ingredientType){
