@@ -210,7 +210,7 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
                     "matrixB": Object.values(matrixB).flat(),
                     "ingredientIds": orderedIngIds
         }
-
+        console.log(parameters_py);
         const python = spawn('python3', ['../TFG/helpers/solver.py']);
         
         python.stdin.write(JSON.stringify(parameters_py));

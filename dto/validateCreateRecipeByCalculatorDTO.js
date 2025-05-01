@@ -13,8 +13,13 @@ const CreateUserDTOSchema = Type.Object(
         description: Type.String({
             errorMessage: "La descripcion tiene que ser un String"
         }),
-        familyId: Type.Number({
-            errorMessage: "La id de la familia tiene que ser un numero"
+        familyId: Type.Union(
+            [
+                Type.Number(),
+                Type.Null()
+            ],
+            {
+            errorMessage: "La materia grasa tiene que ser un numero o null"
         }),
         POD: Type.Union(
             [
@@ -93,7 +98,9 @@ const validate = ajv.compile(CreateUserDTOSchema);
 function validateCreateRecipeByCalculatorDTO (req, res, next) {
     const isValidDto = validate(req.body);
 
-    if (!isValidDto) return res.status(400).send(ajv.errorsText(validate.errors, {separator: '\n'}));
+    if (!isValidDto) return res.status(400).send(
+        JSON.stringify({"response": ajv.errorsText(validate.errors, {separator: '\n'})})
+    );
 
     next();
 }

@@ -179,7 +179,12 @@ function initRecipeWizard(container) {
         const res = await fetch('http://localhost:3000/recipe/calculate', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('token') }, body: JSON.stringify(body) });
         const calc = await res.json();
         const preview = container.querySelector('#wiz-preview');
-        preview.innerHTML = `<ul>${calc.ingredients.map(i => `<li>${i.name}: ${i.quantity}</li>`).join('')}</ul>`;
+        preview.innerHTML = '<ul>' + calc.ingredients.map(item => {
+            const id = item.id !== undefined ? item.id : item[0];
+            const qty = item.quantity !== undefined ? item.quantity : item[1];
+            const name = ingredientsList.find(x => x.id === id)?.name || 'Ingrediente';
+            return `<li>${name}: ${qty}</li>`;
+          }).join('') + '</ul>';
         current = 4; showStep(4);
       } catch (e) { console.error('Error calculando:', e); }
     }

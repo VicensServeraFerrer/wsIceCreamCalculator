@@ -27,7 +27,7 @@ async function buildMatrix(ingredients, bounds){
             const PAC = getPAC(bounds.TS);
             matrixB[key].push(PAC.PACub);
         } else {
-            matrixB[key].push(bounds[key]);
+            matrixB[key].push(bounds[key] ? bounds[key] : 0);
         }
 
         ingredients.forEach(ingredient => {
