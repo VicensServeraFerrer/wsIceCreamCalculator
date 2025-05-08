@@ -1,3 +1,6 @@
+// dashboard.js
+// Control de navegación y carga de módulos en la dashboard de Gelato Calculator
+
 document.addEventListener('DOMContentLoaded', function() {
   const sidebarItems      = document.querySelectorAll('.sidebar ul li');
   const btnAlta           = document.getElementById('btnAlta');
@@ -10,8 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const dynamicView       = document.getElementById('dynamicView');
   const actionPanel       = document.getElementById('actionPanel');
 
+  // Recargar al hacer clic en el logo
   headerLogo.addEventListener('click', () => location.reload());
 
+  // Manejo de selección en el menú lateral
   sidebarItems.forEach(item => {
     item.addEventListener('click', () => {
       const sec = item.getAttribute('data-section');
@@ -19,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
       sidebarItems.forEach(i => i.classList.remove('active'));
       item.classList.add('active');
 
-      // Mostrar botones según sección
+      // Mostrar/ocultar botones según sección
       if (sec === 'recetas') {
         btnCalcular.style.display     = 'flex';
         btnCrearFamilia.style.display = 'flex';
@@ -28,42 +33,45 @@ document.addEventListener('DOMContentLoaded', function() {
         btnCrearFamilia.style.display = 'none';
       }
 
-      // Restaurar vista por defecto
-      dynamicView.style.display = 'none';
-      dynamicView.innerHTML     = '';
-      defaultContent.style.display = 'block';
-      actionPanel.style.display   = 'flex';
+      // Restaurar vista
+      dynamicView.style.display     = 'none';
+      dynamicView.innerHTML         = '';
+      defaultContent.style.display  = 'block';
+      actionPanel.style.display     = 'flex';
     });
   });
 
+  // Alta (nuevo registro)
   btnAlta.addEventListener('click', () => {
     const sel = document.querySelector('.sidebar ul li.active')?.dataset.section;
     if (sel === 'proveedores') showProviderAltaForm();
     else if (sel === 'ingredientes') showIngredientAltaForm();
+    else if (sel === 'recetas') showRecipeCreateForm();
   });
 
+  // Búsqueda
   btnBusqueda.addEventListener('click', () => {
     const sel = document.querySelector('.sidebar ul li.active')?.dataset.section;
     showSearchForm(sel);
   });
 
+  // Calculadora de recetas
   btnCalcular.addEventListener('click', () => {
     if (document.querySelector('.sidebar ul li.active')?.dataset.section === 'recetas') {
       showRecipeWizardForm();
     }
   });
 
-  // Manejador para “Crear Familia” (stub por ahora)
+  // Crear familia (placeholder)
   btnCrearFamilia.addEventListener('click', () => {
-    // Oculta vista y prepara contenedor
     defaultContent.style.display = 'none';
     actionPanel.style.display    = 'none';
     dynamicView.innerHTML        = '';
     dynamicView.style.display    = 'block';
-    // Aquí llamaremos más adelante a initFamilyCreate(dynamicView);
-    dynamicView.innerHTML = '<p>Aquí irá el formulario de Crear Familia.</p>';
+    dynamicView.innerHTML        = '<p>Aquí irá el formulario de Crear Familia.</p>';
   });
 
+  // Función genérica para cargar buscadores
   function showSearchForm(type) {
     defaultContent.style.display = 'none';
     actionPanel.style.display    = 'none';
@@ -71,9 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
     dynamicView.style.display    = 'block';
     if (type === 'proveedores') initProviderSearch(dynamicView);
     else if (type === 'ingredientes') initIngredientSearch(dynamicView);
-    else console.warn('Búsqueda no implementada');
+    else if (type === 'recetas') initRecipeSearch(dynamicView);
+    else console.warn('Búsqueda no implementada para', type);
   }
 
+  // Alta proveedor
   function showProviderAltaForm() {
     defaultContent.style.display = 'none';
     actionPanel.style.display    = 'none';
@@ -82,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initProviderAlta(dynamicView);
   }
 
+  // Alta ingrediente
   function showIngredientAltaForm() {
     defaultContent.style.display = 'none';
     actionPanel.style.display    = 'none';
@@ -90,6 +101,16 @@ document.addEventListener('DOMContentLoaded', function() {
     initIngredientAlta(dynamicView);
   }
 
+  // Alta receta
+  function showRecipeCreateForm() {
+    defaultContent.style.display = 'none';
+    actionPanel.style.display    = 'none';
+    dynamicView.innerHTML        = '';
+    dynamicView.style.display    = 'block';
+    initRecipeCreate(dynamicView);
+  }
+
+  // Calculadora wizard de recetas
   function showRecipeWizardForm() {
     defaultContent.style.display = 'none';
     actionPanel.style.display    = 'none';

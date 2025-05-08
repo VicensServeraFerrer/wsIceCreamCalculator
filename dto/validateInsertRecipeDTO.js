@@ -22,7 +22,7 @@ const InsertRecipeDTOSchema = Type.Object(
             errorMessage: "La id de la familia tiene que ser un numero o null"
         }),
         TS: Type.Number({
-            errorMessage: "La id de la familia tiene que ser un numero"
+            errorMessage: "La temperatura de servicio tiene que ser un numero"
         }),
         ingredients: Type.Array(
             Type.Object({
