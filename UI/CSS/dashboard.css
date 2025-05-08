@@ -130,3 +130,12 @@ header .profile {
 .calcular-button {
   background-color: rgba(255,255,255,0.8);
 }
+
+
+/* Botón Crear Familia */
+.familia-button {
+  background-color: rgba(255,255,255,0.8);
+  /*background-image: url("images/folder-add.png"); /* icono de familia */
+  background-repeat: no-repeat;
+  background-position: center 40%;
+}

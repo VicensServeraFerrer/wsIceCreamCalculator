@@ -1,14 +1,13 @@
 // providerSearchModule.js
-// Este módulo gestiona la vista y funcionalidad para la búsqueda de proveedores.
+// Módulo para búsqueda de proveedores y asociación de ingredientes con precio
 
-// Vincular providerSearch.css si aún no está vinculado
+// Vincular stylesheet
 if (!document.getElementById('providerSearch-css')) {
-    const linkElem = document.createElement('link');
-    linkElem.id = 'providerSearch-css';
-    linkElem.rel = 'stylesheet';
-    // Ajusta esta ruta según la estructura de tu proyecto (en este ejemplo, la carpeta CSS se encuentra en el directorio superior)
-    linkElem.href = '../CSS/providerSearch.css';
-    document.head.appendChild(linkElem);
+  const link = document.createElement('link');
+  link.id = 'providerSearch-css';
+  link.rel = 'stylesheet';
+  link.href = '../CSS/providerSearch.css';
+  document.head.appendChild(link);
 }
 
 const providerSearchTemplate = `
@@ -24,19 +23,19 @@ const providerSearchTemplate = `
 
 /**
  * Inicializa la vista de búsqueda de proveedores en el contenedor especificado.
- * @param {HTMLElement} container - El contenedor donde se inyectará la vista.
+ * @param {HTMLElement} container
  */
 function initProviderSearch(container) {
   container.innerHTML = providerSearchTemplate;
 
-  const searchBtn = document.getElementById('providerSearchBtn');
-  const searchInput = document.getElementById('providerSearchInput');
-  const providerList = document.getElementById('providerList');
+  const searchBtn    = container.querySelector('#providerSearchBtn');
+  const searchInput  = container.querySelector('#providerSearchInput');
+  const providerList = container.querySelector('#providerList');
 
-  // Función para renderizar la lista de proveedores en formato tabla
+  // Render tabla de proveedores con columna de “Acciones”
   function renderProviderList(providers) {
-    if (providers.length === 0) {
-      providerList.innerHTML = "<p>No se encontraron proveedores.</p>";
+    if (!providers.length) {
+      providerList.innerHTML = `<p>No se encontraron proveedores.</p>`;
       return;
     }
     let html = `
@@ -46,52 +45,117 @@ function initProviderSearch(container) {
             <th>Nombre</th>
             <th>Dirección</th>
             <th>Teléfono</th>
-            <th>Acciones</th>
+            <th>Acción</th>
           </tr>
         </thead>
-        <tbody>`;
-    providers.forEach(provider => {
-      // Se asume que el proveedor tiene una propiedad 'id' o 'uuid'. Ajusta según corresponda.
-      const providerId = provider.id || provider.uuid;
-      html += `<tr class="provider-item">
-        <td>${provider.name}</td>
-        <td>${provider.address}</td>
-        <td>${provider.tlf}</td>
-        <td>
-          <button class="associate-btn" data-provider-id="${providerId}">Asociar</button>
-        </td>
-      </tr>`;
-    });
-    html += `
-        </tbody>
-      </table>
+        <tbody>
     `;
+    providers.forEach((prov, i) => {
+      const pid = prov.id || prov.uuid;
+      html += `
+        <tr>
+          <td>${prov.name}</td>
+          <td>${prov.address}</td>
+          <td>${prov.tlf}</td>
+          <td>
+            <button class="associate-btn" data-provider-id="${pid}" data-index="${i}">
+              Asociar
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+    html += `</tbody></table>`;
     providerList.innerHTML = html;
+
+    // Adjuntamos evento a cada “Asociar”
+    providerList.querySelectorAll('.associate-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const providerId = btn.dataset.providerId;
+        openAssociateFlow(providerId);
+      });
+    });
   }
 
-  // Al pulsar el botón de búsqueda...
-  searchBtn.addEventListener("click", function() {
-    fetch("http://localhost:3000/provider/getAll", {
-      method: "GET",
-      headers: { 
-        "Authorization": localStorage.getItem("token")
-      }
+  // Flujo de asociación: buscar ingrediente → precio → confirmar
+  function openAssociateFlow(providerId) {
+    // 1. Abrir modal de selección de ingrediente
+    openIngredientModal(ing => {
+      // 2. Tras seleccionar ingrediente, preguntar precio
+      const overlay = document.createElement('div');
+      overlay.className = 'association-modal';
+      overlay.innerHTML = `
+        <div class="association-modal-content">
+          <h3>Asociar “${ing.name}”</h3>
+          <div class="form-group">
+            <label>Precio:</label>
+            <input type="number" id="assoc-price" min="0" step="0.01" placeholder="p. ej. 1.25">
+          </div>
+          <div class="buttons">
+            <button id="assoc-confirm" disabled>Confirmar</button>
+            <button id="assoc-cancel">Cancelar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const inputPrice   = overlay.querySelector('#assoc-price');
+      const btnConfirm   = overlay.querySelector('#assoc-confirm');
+      const btnCancel    = overlay.querySelector('#assoc-cancel');
+
+      // Habilitar confirmación solo si hay precio válido
+      inputPrice.addEventListener('input', () => {
+        btnConfirm.disabled = !inputPrice.value || Number(inputPrice.value) < 0;
+      });
+
+      btnCancel.addEventListener('click', () => overlay.remove());
+
+      btnConfirm.addEventListener('click', async () => {
+        const price = Number(inputPrice.value);
+        try {
+          const resp = await fetch('http://localhost:3000/provider/asociate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+              providerId: Number(providerId),
+              ingredientId: ing.id,
+              price: price
+            })
+          });
+          if (resp.ok) {
+            alert('Asociación creada con éxito');
+          } else {
+            const txt = await resp.text();
+            alert('Error: ' + txt);
+          }
+        } catch (err) {
+          console.error('Error en asociación:', err);
+          alert('Error de red');
+        } finally {
+          overlay.remove();
+        }
+      });
+    });
+  }
+
+  // Al pulsar “Buscar…”
+  searchBtn.addEventListener('click', () => {
+    fetch('http://localhost:3000/provider/getAll', {
+      headers: { 'Authorization': localStorage.getItem('token') }
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-      let providers = data.providers || [];
-      // Si hay texto en el input, se filtra por nombre (búsqueda case-insensitive)
-      const query = searchInput.value.trim().toLowerCase();
-      if(query) {
-        providers = providers.filter(provider => 
-          provider.name.toLowerCase().includes(query)
-        );
-      }
-      renderProviderList(providers);
+      let provs = data.providers || [];
+      const q = searchInput.value.trim().toLowerCase();
+      if (q) provs = provs.filter(p => p.name.toLowerCase().includes(q));
+      renderProviderList(provs);
     })
-    .catch(error => console.error("Error al obtener proveedores:", error));
+    .catch(err => console.error('Error cargando proveedores:', err));
   });
 }
 
-// Exponemos la función globalmente para que pueda ser llamada desde dashboard.js
+// Exponer globalmente
 window.initProviderSearch = initProviderSearch;

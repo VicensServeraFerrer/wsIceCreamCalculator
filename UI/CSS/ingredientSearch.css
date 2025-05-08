@@ -118,3 +118,49 @@
     font-size: 16px;
     cursor: pointer;
 }
+
+/* ingredientSearch.css */
+/* Modal de modificación centrado */
+.modify-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modify-modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .modify-modal-content h3 {
+    margin-top: 0;
+  }
+  .form-message {
+    min-height: 1.2em;
+    margin: 10px 0;
+    text-align: center;
+    font-weight: bold;
+  }
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .form-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #cancelEdit { background: #dc3545; color: #fff; }
+  #confirmEdit { background: #28a745; color: #fff; }
+  #confirmEdit:disabled { opacity: 0.6; cursor: not-allowed; }
+  

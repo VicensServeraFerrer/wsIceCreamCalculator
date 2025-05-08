@@ -1,14 +1,13 @@
 // ingredientSearchModule.js
-// Este módulo gestiona la vista y funcionalidad para la búsqueda de ingredientes.
+// Módulo gestiona búsqueda y modificación de ingredientes
 
-// Vincular ingredientSearch.css si aún no está vinculado
+// Vincular stylesheet
 if (!document.getElementById('ingredientSearch-css')) {
-    const linkElem = document.createElement('link');
-    linkElem.id = 'ingredientSearch-css';
-    linkElem.rel = 'stylesheet';
-    // Ajusta esta ruta según la estructura de tu proyecto
-    linkElem.href = '../CSS/ingredientSearch.css';
-    document.head.appendChild(linkElem);
+  const linkElem = document.createElement('link');
+  linkElem.id = 'ingredientSearch-css';
+  linkElem.rel = 'stylesheet';
+  linkElem.href = '../CSS/ingredientSearch.css';
+  document.head.appendChild(linkElem);
 }
 
 const ingredientSearchTemplate = `
@@ -36,133 +35,161 @@ const ingredientSearchTemplate = `
 `;
 
 /**
- * Inicializa la vista de búsqueda de ingredientes en el contenedor especificado.
- * @param {HTMLElement} container - El contenedor donde se inyectará la vista.
+ * Inicializa la vista de búsqueda y modificación de ingredientes.
+ * @param {HTMLElement} container
  */
 function initIngredientSearch(container) {
   container.innerHTML = ingredientSearchTemplate;
 
-  const typeSelect = document.getElementById('ingredientTypeSelectSearch');
-  const searchInput = document.getElementById('ingredientSearchInput');
-  const searchBtn = document.getElementById('ingredientSearchBtn');
-  const ingredientList = document.getElementById('ingredientList');
+  const typeSelect     = container.querySelector('#ingredientTypeSelectSearch');
+  const searchInput    = container.querySelector('#ingredientSearchInput');
+  const searchBtn      = container.querySelector('#ingredientSearchBtn');
+  const ingredientList = container.querySelector('#ingredientList');
 
-  /**
-   * Renderiza el listado de ingredientes en forma de tabla estilo lista.
-   * Cada fila muestra:
-   *  - Nombre y tipo
-   *  - Un botón toggle para desplegar/contraer detalles
-   *  - Un botón "Modificar" a la derecha
-   */
   function renderIngredientList(ingredients) {
-    if (ingredients.length === 0) {
-      ingredientList.innerHTML = "<p>No se encontraron ingredientes.</p>";
+    if (!ingredients.length) {
+      ingredientList.innerHTML = '<p>No se encontraron ingredientes.</p>';
       return;
     }
-    // Encabezado tipo tabla
+    // Header y filas
     let html = `
       <div class="ingredient-table-header">
-        <div class="col-name">Nombre</div>
-        <div class="col-type">Tipo</div>
-        <div class="col-toggle">Detalles</div>
-        <div class="col-action">Acciones</div>
+        <div>Nombre</div><div>Tipo</div><div>Detalles</div><div>Acciones</div>
       </div>
     `;
-    // Por cada ingrediente se crea una fila
-    ingredients.forEach(ingredient => {
-      // Se asume que las propiedades básicas son 'name' y 'ingredientType'
-      // Los detalles se mostrarán en un contenedor que inicialmente está oculto.
+    ingredients.forEach(ing => {
+      const id = ing.ingredientId || ing.id;
       html += `
         <div class="ingredient-table-row">
-          <div class="col-name">${ingredient.name}</div>
-          <div class="col-type">${ingredient.ingredientType}</div>
-          <div class="col-toggle">
-            <button class="toggle-details-btn">►</button>
-          </div>
-          <div class="col-action">
-            <button class="modify-btn">Modificar</button>
-          </div>
-          <div class="ingredient-details" style="display: none;">
-            ${renderIngredientDetails(ingredient)}
+          <div>${ing.name}</div>
+          <div>${ing.ingredientType}</div>
+          <div><button class="toggle-details-btn">►</button></div>
+          <div><button class="modify-btn" data-id="${id}">Modificar</button></div>
+          <div class="ingredient-details" style="display:none;">
+            ${renderIngredientDetails(ing)}
           </div>
         </div>
       `;
     });
     ingredientList.innerHTML = html;
-    
-    // Agregar eventos a cada botón toggle para mostrar u ocultar detalles
-    const toggleBtns = ingredientList.querySelectorAll('.toggle-details-btn');
-    toggleBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
+
+    ingredientList.querySelectorAll('.toggle-details-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
         const row = btn.closest('.ingredient-table-row');
-        const detailsDiv = row.querySelector('.ingredient-details');
-        if (detailsDiv.style.display === 'none') {
-          detailsDiv.style.display = 'block';
-          btn.textContent = '▼';
-        } else {
-          detailsDiv.style.display = 'none';
-          btn.textContent = '►';
-        }
+        const det = row.querySelector('.ingredient-details');
+        const visible = det.style.display === 'block';
+        det.style.display = visible ? 'none' : 'block';
+        btn.textContent   = visible ? '►' : '▼';
       });
     });
-    
-    // Los botones "Modificar" se pueden gestionar aquí; por ahora solo se deja un placeholder.
-    const modifyBtns = ingredientList.querySelectorAll('.modify-btn');
-    modifyBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        // Aquí se implementará la funcionalidad para modificar el ingrediente.
-        alert("Funcionalidad de modificar ingrediente pendiente de implementar.");
+
+    ingredientList.querySelectorAll('.modify-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ingId = btn.dataset.id;
+        const ingObj = ingredients.find(item => String(item.ingredientId||item.id) === ingId);
+        openModifyModal(ingObj, () => searchBtn.click());
       });
     });
   }
 
-  /**
-   * Función auxiliar para renderizar los detalles de un ingrediente.
-   * Se muestran todas sus propiedades excepto 'name' y 'ingredientType'.
-   * @param {Object} ingredient 
-   */
-  function renderIngredientDetails(ingredient) {
-    let detailsHTML = `<table class="ingredient-details-table">`;
-    for (const key in ingredient) {
-      if (key !== 'name' && key !== 'ingredientType' && ingredient[key] !== null && key !== 'userId' && key !== 'ingredientId'  && key !== 'createdAt' && key !== 'updatedAt') {
-        detailsHTML += `<tr>
-          <td class="detail-key">${key}</td>
-          <td class="detail-value">${ingredient[key]}</td>
-        </tr>`;
-      }
+  function renderIngredientDetails(ing) {
+    let rows = '';
+    for (const key in ing) {
+      if (['ingredientId','id','userId','createdAt','updatedAt'].includes(key)) continue;
+      const val = ing[key];
+      if (val === null) continue;
+      rows += `<tr><td>${key}</td><td>${val}</td></tr>`;
     }
-    detailsHTML += `</table>`;
-    return detailsHTML;
+    return `<table class="ingredient-details-table">${rows}</table>`;
   }
-  
-  // Acción de búsqueda
-  searchBtn.addEventListener('click', function() {
-    let url = "http://localhost:3000/ingredient/getAll";
-    const selectedType = typeSelect.value;
-    if (selectedType !== "") {
-      url = `http://localhost:3000/ingredient/getAll/${selectedType}`;
+
+  function openModifyModal(ing, onSuccess) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modify-modal';
+    const content = document.createElement('div');
+    content.className = 'modify-modal-content';
+    content.innerHTML = `
+      <h3>Modificar: ${ing.name}</h3>
+      <form id="editIngForm"></form>
+    `;
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    const form = content.querySelector('#editIngForm');
+    for (const key in ing) {
+      if (['ingredientId','id','userId','createdAt','updatedAt'].includes(key)) continue;
+      const val = ing[key] == null ? '' : ing[key];
+      const inputType = typeof val === 'number' ? 'number' : 'text';
+      form.innerHTML += `
+        <div class="form-group">
+          <label>${key}:</label>
+          <input type="${inputType}" name="${key}" value="${val}" ${inputType==='number'? 'step="any"':''} />
+        </div>
+      `;
     }
-    fetch(url, {
-      method: "GET",
-      headers: { 
-        "Authorization": localStorage.getItem("token")
+    form.innerHTML += `
+      <div class="form-message"></div>
+      <div class="form-actions">
+        <button type="button" id="cancelEdit">Cancelar</button>
+        <button type="button" id="confirmEdit">Guardar</button>
+      </div>
+    `;
+
+    const msgDiv   = content.querySelector('.form-message');
+    const btnCancel= content.querySelector('#cancelEdit');
+    const btnConfirm= content.querySelector('#confirmEdit');
+
+    btnCancel.onclick = () => overlay.remove();
+    btnConfirm.onclick = async () => {
+      btnConfirm.disabled = true;
+      btnCancel.disabled  = true;
+      msgDiv.style.color = '#007bff';
+      msgDiv.textContent = 'Guardando cambios...';
+
+      const data = {};
+      new FormData(form).forEach((v,k) => { data[k] = isNaN(v)? v : Number(v); });
+      try {
+        const resp = await fetch(`http://localhost:3000/ingredient/modify/${ing.ingredientId||ing.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', 'Authorization': localStorage.getItem('token') },
+          body: JSON.stringify(data)
+        });
+        if (resp.ok) {
+          msgDiv.style.color = 'green';
+          msgDiv.textContent = 'Ingrediente modificado con éxito';
+          setTimeout(() => { overlay.remove(); onSuccess(); }, 1500);
+        } else {
+          const err = await resp.text();
+          msgDiv.style.color = 'red';
+          msgDiv.textContent = 'Error: ' + err;
+          btnConfirm.disabled = false;
+          btnCancel.disabled  = false;
+        }
+      } catch (e) {
+        console.error(e);
+        msgDiv.style.color = 'red';
+        msgDiv.textContent = 'Error de red';
+        btnConfirm.disabled = false;
+        btnCancel.disabled  = false;
       }
-    })
-    .then(response => response.json())
-    .then(data => {
-      let ingredients = data.ingredients || [];
-      // Filtrar por nombre si se ingresó texto
-      const query = searchInput.value.trim().toLowerCase();
-      if(query) {
-        ingredients = ingredients.filter(ingredient =>
-          ingredient.name.toLowerCase().includes(query)
-        );
-      }
-      renderIngredientList(ingredients);
-    })
-    .catch(error => console.error("Error al obtener ingredientes:", error));
+    };
+  }
+
+  // Búsqueda
+  searchBtn.addEventListener('click', () => {
+    let url = 'http://localhost:3000/ingredient/getAll';
+    const t = typeSelect.value;
+    if (t) url += `/${t}`;
+    fetch(url, { headers: { 'Authorization': localStorage.getItem('token') } })
+      .then(r=>r.json())
+      .then(data=>{
+        let arr = data.ingredients || [];
+        const q = searchInput.value.trim().toLowerCase();
+        if (q) arr = arr.filter(i=>i.name.toLowerCase().includes(q));
+        renderIngredientList(arr);
+      })
+      .catch(e=> console.error('Error:', e));
   });
 }
 
-// Exponemos la función globalmente para su uso en dashboard.js
 window.initIngredientSearch = initIngredientSearch;
