@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dynamicView.innerHTML        = '';
     dynamicView.style.display    = 'block';
     dynamicView.innerHTML        = '<p>Aquí irá el formulario de Crear Familia.</p>';
+    initFamilyCreate(dynamicView);
   });
 
   // Función genérica para cargar buscadores
