@@ -1,0 +1,84 @@
+/* recipeSearch.css */
+.recipe-search-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .recipe-search-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  
+  .search-bar .search-btn {
+    width: 50px;
+    height: 50px;
+    border: none;
+    background-color: #007BFF;
+    border-radius: 4px;
+    background-image: url("images/magnifying-glass.png");
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+  }
+  
+  .recipe-header, .recipe-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    align-items: center;
+  }
+  
+  .recipe-header {
+    font-weight: bold;
+    background: #f0f0f0;
+  }
+  
+  .recipe-details {
+    grid-column: 1 / -1;
+    background: #fafafa;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+  }
+  
+  .associate-btn, .produce-btn, .details-btn {
+    padding: 6px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .associate-btn {
+    background: #28a745;
+    color: #fff;
+  }
+  
+  .produce-btn {
+    background: #17a2b8;
+    color: #fff;
+  }
+  
+  .details-btn {
+    background: #ffc107;
+    color: #000;
+  }
+  
