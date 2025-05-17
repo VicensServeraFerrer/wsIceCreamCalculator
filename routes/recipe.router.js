@@ -53,7 +53,7 @@ recipeRouter.get("/getAll", authByToken, async (req, res) => {
             userIds.push(req.jwtData.payload.uuid);
 
             const recipes = await Recipe.findAll({where: {"userId": userIds}, order: [['userId', 'ASC']]});
-            
+
             return res.status(200).send(recipes);
         }
     } catch (err) {
@@ -105,6 +105,7 @@ recipeRouter.post("/insert", authByToken, validateInsertRecipeDTO, async (req, r
             })
         })
 
+        console.log(newRecipe);
         const insertedRecipe = await Recipe.create(newRecipe);
 
         ingredients.forEach(async ingredient => {

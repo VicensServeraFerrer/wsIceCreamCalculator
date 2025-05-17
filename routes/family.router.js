@@ -7,13 +7,21 @@ import validateAsociationFamRecipeDTO from '../dto/validateAsociationFamRecipeDT
 const familyRouter = express.Router();
 const { Recipe, Family } = db
 
+familyRouter.get("/getAll", authByToken, async (req, res) => {
+    try {
+        const families = await Family.findAll({where: {"userId": req.jwtData.payload.uuid}});
+
+        return res.status(200).send(families);
+    } catch (err) {
+        res.status(400).send(err)
+    }
+})
+
 familyRouter.post("/addRecipe", authByToken, validateAsociationFamRecipeDTO, async (req, res) => {
     const {recipeId, familyId} = req.body;
 
     try{
-        const recipeToModify = await Recipe.findOne({where: {"id": recipeId, "userId": req.jwtData.payload.uuid}});
-
-        const [affectedCount, affectedRows] = await Recipe.update(recipeToModify, {where: {"familyId": familyId}, returning: true})
+        const [affectedCount, affectedRows] = await Recipe.update({"familyId": familyId}, {where: {"id": recipeId}, returning: true})
 
         if(affectedCount == 0) return res.status(200).send("No se modificó ningun elemento")
 

@@ -1,0 +1,84 @@
+/* familyAssociate.css */
+.family-assoc-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+.family-assoc-modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.family-assoc-modal .close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  cursor: pointer;
+}
+.family-assoc-modal h2 {
+  margin-top: 0;
+  text-align: center;
+}
+.family-assoc-modal .search-bar {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+.family-assoc-modal .search-bar input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.family-assoc-modal .search-bar button {
+  padding: 8px 12px;
+  border: none;
+  background: #007BFF;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.family-assoc-modal .search-bar button:hover {
+  background: #0056b3;
+}
+.fam-list {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.fam-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+.fam-item .fam-info {
+  flex: 1;
+}
+.fam-item .confirm-assoc {
+  padding: 6px 10px;
+  border: none;
+  background: #28a745;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.fam-item .confirm-assoc:hover {
+  background: #218838;
+}

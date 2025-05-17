@@ -140,8 +140,9 @@ function initRecipeWizard(container) {
   const prevBtn = container.querySelector('#wiz-prev');
   const nextBtn = container.querySelector('#wiz-next');
 
-  let current = 1; const maxStep = 4;
-  const data = { name: '', desc: '', POD: null, MG: null, ST: null, LPD: null, TS: null, percentCocoa: null, ingredients: [] };
+  let current = 1;
+  const maxStep = 4;
+  const data = { name: '', desc: '', familyId: null, POD: null, MG: null, ST: null, LPD: null, TS: null, percentCocoa: null, ingredients: [] };
   const ingsContainer = container.querySelector('#wiz-ings-list');
   let ingredientsList = [];
 
@@ -149,7 +150,7 @@ function initRecipeWizard(container) {
     steps.forEach(s => s.classList.toggle('active', Number(s.dataset.step) === n));
     stepTabs.forEach(t => t.classList.toggle('active', Number(t.dataset.step) === n));
     prevBtn.disabled = n === 1;
-    nextBtn.textContent = (n < maxStep ? 'Siguiente' : 'Guardar');
+    nextBtn.textContent = n < maxStep ? 'Siguiente' : 'Guardar';
   }
 
   function collectStepData(n) {
@@ -159,41 +160,84 @@ function initRecipeWizard(container) {
     }
     if (n === 3) {
       data.POD = Number(container.querySelector('#wiz-POD').value) || null;
-      data.MG  = Number(container.querySelector('#wiz-MG').value)  || null;
-      data.ST  = Number(container.querySelector('#wiz-ST').value)  || null;
+      data.MG = Number(container.querySelector('#wiz-MG').value) || null;
+      data.ST = Number(container.querySelector('#wiz-ST').value) || null;
       data.LPD = Number(container.querySelector('#wiz-LPD').value) || null;
-      data.TS  = Number(container.querySelector('#wiz-TS').value);
+      data.TS = Number(container.querySelector('#wiz-TS').value);
       data.percentCocoa = Number(container.querySelector('#wiz-percentCocoa').value) || null;
     }
   }
 
-  prevBtn.addEventListener('click', () => { if (current > 1) { current--; showStep(current); }});
+  prevBtn.addEventListener('click', () => {
+    if (current > 1) {
+      current--;
+      showStep(current);
+    }
+  });
+
   nextBtn.addEventListener('click', async () => {
-    if (current === 1) { collectStepData(1); current = 2; showStep(2); }
-    else if (current === 2) { current = 3; showStep(3); }
-    else if (current === 3) {
+    if (current === 1) {
+      collectStepData(1);
+      current = 2;
+      showStep(2);
+    } else if (current === 2) {
+      current = 3;
+      showStep(3);
+    } else if (current === 3) {
       collectStepData(3);
       data.ingredients = ingredientsList.map(ing => ({ id: ing.id, quantity: ing.quantity }));
-      const body = { name: data.name, description: data.desc, familyId: null, POD: data.POD, MG: data.MG, ST: data.ST, LPD: data.LPD, TS: data.TS, percentCocoa: data.percentCocoa, ingredients: data.ingredients };
+      const body = {
+        name: data.name,
+        description: data.desc,
+        familyId: data.familyId,
+        POD: data.POD,
+        MG: data.MG,
+        ST: data.ST,
+        LPD: data.LPD,
+        TS: data.TS,
+        percentCocoa: data.percentCocoa,
+        ingredients: data.ingredients
+      };
       try {
-        const res = await fetch('http://localhost:3000/recipe/calculate', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('token') }, body: JSON.stringify(body) });
+        const res = await fetch('http://localhost:3000/recipe/calculate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem('token')
+          },
+          body: JSON.stringify(body)
+        });
         const calc = await res.json();
+        // Actualizamos data.ingredients con los resultados calculados
+        data.ingredients = calc.ingredients.map(item => ({ id: item.id, quantity: item.quantity }));
         const preview = container.querySelector('#wiz-preview');
-        preview.innerHTML = '<ul>' + calc.ingredients.map(item => {
-            const id = item.id !== undefined ? item.id : item[0];
-            const qty = item.quantity !== undefined ? item.quantity : item[1];
-            const name = ingredientsList.find(x => x.id === id)?.name || 'Ingrediente';
-            return `<li>${name}: ${qty}</li>`;
-          }).join('') + '</ul>';
-        current = 4; showStep(4);
-      } catch (e) { console.error('Error calculando:', e); }
-    }
-    else if (current === 4) {
-      const insertBody = { name: data.name, description: data.desc, familyId: null, TS: data.TS, ingredients: data.ingredients };
+        preview.innerHTML = '<ul>' + data.ingredients.map(i => `<li>${ingredientsList.find(x => x.id === i.id)?.name || 'Ingrediente'}: ${i.quantity}</li>`).join('') + '</ul>';
+        current = 4;
+        showStep(4);
+      } catch (e) {
+        console.error('Error calculando:', e);
+      }
+    } else if (current === 4) {
+      const insertBody = {
+        name: data.name,
+        description: data.desc,
+        familyId: data.familyId,
+        TS: data.TS,
+        ingredients: data.ingredients
+      };
       try {
-        const res = await fetch('http://localhost:3000/recipe/insert', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('token') }, body: JSON.stringify(insertBody) });
+        const res = await fetch('http://localhost:3000/recipe/insert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem('token')
+          },
+          body: JSON.stringify(insertBody)
+        });
         alert(res.ok ? 'Receta guardada' : 'Error al guardar');
-      } catch (e) { console.error('Error guardando:', e); }
+      } catch (e) {
+        console.error('Error guardando:', e);
+      }
     }
   });
 
@@ -203,10 +247,15 @@ function initRecipeWizard(container) {
       if (!ingredientsList.some(x => x.id === ing.id)) {
         ing.quantity = 0;
         ingredientsList.push(ing);
-        const row = document.createElement('div'); row.className = 'ing-row';
-        row.innerHTML = `<span>${ing.name}</span><input type=\"number\" value=\"0\" min=\"0\"><button>✕</button>`;
-        const inp = row.querySelector('input'); inp.addEventListener('input', () => ing.quantity = Number(inp.value));
-        row.querySelector('button').addEventListener('click', () => { ingredientsList = ingredientsList.filter(x => x.id !== ing.id); row.remove(); });
+        const row = document.createElement('div');
+        row.className = 'ing-row';
+        row.innerHTML = `<span>${ing.name}</span><input type="number" value="0" min="0"><button>✕</button>`;
+        const inp = row.querySelector('input');
+        inp.addEventListener('input', () => ing.quantity = Number(inp.value));
+        row.querySelector('button').addEventListener('click', () => {
+          ingredientsList = ingredientsList.filter(x => x.id !== ing.id);
+          row.remove();
+        });
         ingsContainer.append(row);
       }
     });

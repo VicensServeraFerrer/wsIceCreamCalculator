@@ -85,7 +85,7 @@ const Type = sequelize.define('Type', {
 const IngredientRecipe = sequelize.define('IngredientRecipe', {
     ingredientId: { type: DataTypes.INTEGER, references: { model: Ingredient, key: 'ingredientId' } },
     recipeId: { type: DataTypes.INTEGER, references: { model: Recipe, key: 'id' } },
-    quantity: { type: DataTypes.INTEGER },
+    quantity: { type: DataTypes.FLOAT },
 });
 
 const Provider = sequelize.define('Provider', {

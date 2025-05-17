@@ -84,7 +84,10 @@ if (!document.getElementById('recipeSearch-css')) {
   
       // Asociar y Producir (stubs)
       recipeListEl.querySelectorAll('.associate-btn').forEach(b => {
-        b.addEventListener('click', () => console.warn('Asociar receta ID', b.closest('.recipe-row').dataset.id));
+        b.addEventListener('click', () => {
+          const recipeId = b.closest('.recipe-row').dataset.id;
+          openFamilyAssociationModal(recipeId);
+        });
       });
       recipeListEl.querySelectorAll('.produce-btn').forEach(b => {
         b.addEventListener('click', () => console.warn('Producir receta ID', b.closest('.recipe-row').dataset.id));
