@@ -6,6 +6,7 @@ import validateCreateRecipeByCalculatorDTO from '../dto/validateCreateRecipeByCa
 import buildMatrix from '../helpers/buildMatrix.js';
 import validateInsertRecipeDTO from '../dto/validateInsertRecipeDTO.js';
 import validateModifyRecipeDTO from '../dto/validateModifyRecipeDTO.js';
+import { index } from 'mathjs';
 
 const recipeRouter = express.Router();
 const { Recipe, Ingredient, User, UserRelation, IngredientRecipe } = db
@@ -44,8 +45,26 @@ recipeRouter.get("/getAll", authByToken, async (req, res) => {
 
         if(userReq.userType == 2){
             const recipes = await Recipe.findAll({where: {"userId": req.jwtData.payload.uuid}, order: [['familyId', 'ASC']]});
-            
-            return res.status(200).send(recipes);
+
+            const fullRecipes = await Promise.all(recipes.map(async rec => {
+                const recObj = rec.toJSON()
+
+                const ingredients = await IngredientRecipe.findAll({where: {"recipeId": recObj.id}});
+
+                const ingredientsWName =  await Promise.all(ingredients.map(async ing => {
+                    const ingObj = ing.toJSON();
+
+                    const fullIngredient = await Ingredient.findOne({where: {"ingredientId": ingObj.ingredientId}});
+
+                    ingObj["name"] = fullIngredient.name;
+                    return ingObj;
+                }))
+
+                recObj["ingredients"] = ingredientsWName;
+                return recObj;
+            })); 
+
+            return res.status(200).send(fullRecipes);
         } else {
             const userIdsRelated = await UserRelation.findAll({where: {"tUserId": req.jwtData.payload.uuid}});
 
