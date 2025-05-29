@@ -80,7 +80,7 @@ recipeRouter.get("/getAll", authByToken, async (req, res) => {
     }
 });
 
-recipeRouter.get("/get/:familyId", authByToken, async (req, res) => {
+recipeRouter.get("/getAll/:familyId", authByToken, async (req, res) => {
     const familyId = req.params.familyId;
 
     try {
