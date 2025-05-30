@@ -1,49 +1,70 @@
 // login.js
-document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
-    const errorDiv = document.getElementById('error');
-  
-    loginForm.addEventListener('submit', async function(e) {
-      e.preventDefault(); // Prevenir el envío tradicional del formulario
-      errorDiv.textContent = ''; // Limpiar mensajes anteriores
-  
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-  
-      try {
-        const response = await fetch('http://localhost:3000/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email, password })
-        });
-  
-        if (!response.ok) {
-          // Si la respuesta no es 200 OK, gestionamos el error
-          if (response.status === 401) {
-            errorDiv.textContent = 'Credenciales incorrectas.';
-          } else {
-            errorDiv.textContent = 'Error en el servidor. Intente más tarde.';
-          }
-          return;
-        }
-  
-        const data = await response.json();
-        const token = data.jwt;
-        
-        if (token) {
-          // Guardamos el token en localStorage para usar en peticiones futuras
-          localStorage.setItem('token', token);
-          // Redireccionamos a la siguiente pantalla, por ejemplo, un dashboard
-          window.location.href = 'dashboard.html';
-        } else {
-          errorDiv.textContent = 'Token no recibido. Intente nuevamente.';
-        }
-      } catch (error) {
-        console.error('Error de conexión:', error);
-        errorDiv.textContent = 'Error de conexión, intente más tarde.';
+// Mejora de UI para login y botón de “Crear Cuenta”
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Construcción dinámica del formulario de login
+  const container = document.querySelector('.login-container');
+  container.innerHTML = `
+    <h2>Iniciar Sesión</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="usuario@ejemplo.com">
+      </div>
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" required placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn-primary">Entrar</button>
+      </div>
+      <div id="error" class="error-message"></div>
+    </form>
+    <div class="alternative">
+      <span>¿No tienes cuenta?</span>
+      <button id="btnCreateAccount" class="btn-secondary">Crear Cuenta</button>
+    </div>
+  `;
+
+  const loginForm = document.getElementById('loginForm');
+  const errorDiv   = document.getElementById('error');
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorDiv.textContent = '';
+
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    try {
+      const res = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!res.ok) {
+        errorDiv.textContent = res.status === 401
+          ? 'Credenciales incorrectas.'
+          : 'Error del servidor. Intenta más tarde.';
+        return;
       }
-    });
+
+      const { jwt } = await res.json();
+      if (jwt) {
+        localStorage.setItem('token', jwt);
+        window.location.href = 'dashboard.html';
+      } else {
+        errorDiv.textContent = 'No se recibió token. Inténtalo de nuevo.';
+      }
+
+    } catch (err) {
+      console.error('Error de conexión:', err);
+      errorDiv.textContent = 'No se puede conectar. Revisa tu red.';
+    }
   });
-  
+
+  // Botón “Crear Cuenta”: abre modal de alta de usuario
+  document.getElementById('btnCreateAccount')
+    .addEventListener('click', openUserCreateModal);
+});

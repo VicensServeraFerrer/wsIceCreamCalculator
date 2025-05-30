@@ -128,14 +128,23 @@ header .profile {
 }
 
 .calcular-button {
-  background-color: rgba(255,255,255,0.8);
+  background-image: url("images/calculator.png");
 }
-
 
 /* Botón Crear Familia */
 .familia-button {
-  background-color: rgba(255,255,255,0.8);
-  /*background-image: url("images/folder-add.png"); /* icono de familia */
-  background-repeat: no-repeat;
-  background-position: center 40%;
+  background-image: url("images/3icecream-cones.png");
+}
+
+/* Fondos por sección */
+.main-content.recetas-bg {
+  background-color: #fff8e1; /* color crema para Recetas */
+}
+
+.main-content.ingredientes-bg {
+  background-color: #e3f2fd; /* color azul claro para Ingredientes */
+}
+
+.main-content.proveedores-bg {
+  background-color: #e8f5e9; /* color verde claro para Proveedores */
 }

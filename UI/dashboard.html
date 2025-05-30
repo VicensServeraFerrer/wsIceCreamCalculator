@@ -7,14 +7,12 @@
   <link rel="stylesheet" href="CSS/dashboard.css">
 </head>
 <body>
-  <!-- Header: logo centrado y apartado de perfil a la derecha -->
   <header>
     <div class="logo">Gelato Calculator</div>
     <div class="profile">Perfil</div>
   </header>
   
   <div class="container">
-    <!-- Menú lateral izquierdo -->
     <nav class="sidebar">
       <ul>
         <li data-section="recetas">Recetas</li>
@@ -23,28 +21,27 @@
       </ul>
     </nav>
     
-    <!-- Área de contenido principal -->
     <main class="main-content">
       <!-- Vista por defecto -->
       <div class="default-content">
         <h1>Bienvenido a Gelato Calculator</h1>
-        <p>Selecciona una opción del menú para comenzar.</p>
       </div>
       
-      <!-- Contenedor para cargar vistas dinámicas (vacío por defecto) -->
-      <div id="dynamicView" style="display: none;"></div>
+      <!-- Contenedor para vistas dinámicas -->
+      <div id="dynamicView"></div>
       
-      <!-- Panel de acciones: botones grandes (Alta, Búsqueda y Calcular) -->
+      <!-- Panel de acciones -->
       <div class="action-panel" id="actionPanel">
         <button id="btnAlta" class="action-button alta-button">Alta</button>
         <button id="btnBusqueda" class="action-button busqueda-button">Búsqueda</button>
-        <!-- Botón "Calcular", visible solo al seleccionar "Recetas" -->
-        <button id="btnCalcular" class="action-button calcular-button" style="display: none;">Calcular</button>
-        <!-- Nuevo: Crear familia -->
-        <button id="btnCrearFamilia" class="action-button familia-button" style="display:none;">Crear Familia</button>
+        <button id="btnCalcular" class="action-button calcular-button">Calcular</button>
+        <button id="btnCrearFamilia" class="action-button familia-button">Crear Familia</button>
       </div>
     </main>
   </div>
+
+  <!-- tus módulos JS -->
+  <script src="JS/userCreateModule.js"></script>
   <script src="JS/providerAltaModule.js"></script>
   <script src="JS/ingredientAltaModule.js"></script>
   <script src="JS/providerSearchModule.js"></script>
@@ -55,6 +52,7 @@
   <script src="JS/produceModule.js"></script>
   <script src="JS/recipeSearchModule.js"></script>
   <script src="JS/familyAsociationModule.js"></script>
+  <!-- dashboard al final -->
   <script src="dashboard.js"></script>
 </body>
 </html>
