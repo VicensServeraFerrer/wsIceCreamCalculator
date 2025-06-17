@@ -20,10 +20,6 @@ def main():
     # TODO: Añadir restricciones a la solución (por ejemplo, límites en las variables)
     lower_bounds = np.zeros(A.shape[1])
     upper_bounds = np.full(A.shape[1], 1000)
-
-    suma_restriccion = np.ones((1, A.shape[1]))       # Fila [1, 1, ..., 1]
-    A = np.vstack([A, suma_restriccion])            # Añadir la fila a la matriz A
-    B = np.append(B, [1000]) 
     
     # Resolver el sistema con restricciones
     res = lsq_linear(A, B, bounds=(lower_bounds, upper_bounds))  # Se pueden añadir bounds=[min, max]

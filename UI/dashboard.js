@@ -13,67 +13,79 @@ document.addEventListener('DOMContentLoaded', () => {
   const actionPanel     = document.getElementById('actionPanel');
   const mainContent     = document.querySelector('.main-content');
 
-  // Inicial: sólo bienvenida
-  actionPanel.style.display = 'none';
-  btnCalcular.style.display = 'none';
+  // Al cargar: sólo mensaje de bienvenida
+  actionPanel.style.display    = 'none';
+  btnCalcular.style.display    = 'none';
   btnCrearFamilia.style.display = 'none';
 
   // Recarga al clicar logo
   headerLogo.addEventListener('click', () => location.reload());
 
+  // Manejo de menú lateral
   sidebarItems.forEach(item => {
     item.addEventListener('click', () => {
       const sec = item.dataset.section;
-      // Título y destacado en menú
+      // Actualizar título
       defaultTitle.textContent = item.textContent.trim();
+      // Marcar activo
       sidebarItems.forEach(i => i.classList.remove('active'));
       item.classList.add('active');
 
-      // Mostrar panel de botones
+      // Mostrar panel de acciones
       actionPanel.style.display = 'flex';
+      // Ocultar botones no aplicables
+      btnCalcular.style.display      = sec === 'recetas' ? 'flex' : 'none';
+      btnCrearFamilia.style.display  = sec === 'recetas' ? 'flex' : 'none';
 
-      // Mostrar/ocultar según sección
-      btnCalcular.style.display     = sec === 'recetas'      ? 'flex' : 'none';
-      btnCrearFamilia.style.display = sec === 'recetas'      ? 'flex' : 'none';
-
-      // Reset dinámico
+      // Reiniciar vistas
+      defaultContent.style.display = 'block';
       dynamicView.style.display    = 'none';
       dynamicView.innerHTML        = '';
-      defaultContent.style.display = 'block';
 
       // Ajustar color de fondo
       mainContent.classList.remove('recetas-bg','ingredientes-bg','proveedores-bg');
       if (sec === 'recetas')      mainContent.classList.add('recetas-bg');
-      else if (sec === 'ingredientes') mainContent.classList.add('ingredientes-bg');
-      else if (sec === 'proveedores')  mainContent.classList.add('proveedores-bg');
+      if (sec === 'ingredientes') mainContent.classList.add('ingredientes-bg');
+      if (sec === 'proveedores')  mainContent.classList.add('proveedores-bg');
     });
   });
+
+  // Función para mostrar un módulo
+  function showModule(initFn) {
+    // Ocultar bienvenida y panel
+    defaultContent.style.display  = 'none';
+    actionPanel.style.display     = 'none';
+    // Limpiar y mostrar dynamicView
+    dynamicView.innerHTML         = '';
+    dynamicView.style.display     = 'block';
+    // Inicializar módulo
+    initFn(dynamicView);
+  }
 
   // Alta
   btnAlta.addEventListener('click', () => {
     const sel = document.querySelector('.sidebar ul li.active')?.dataset.section;
-    if (sel === 'proveedores')       initProviderAlta(dynamicView);
-    else if (sel === 'ingredientes') initIngredientAlta(dynamicView);
-    else if (sel === 'recetas')      initRecipeCreate(dynamicView);
+    if (sel === 'proveedores')       showModule(initProviderAlta);
+    else if (sel === 'ingredientes') showModule(initIngredientAlta);
+    else if (sel === 'recetas')      showModule(initRecipeCreate);
   });
 
   // Búsqueda
   btnBusqueda.addEventListener('click', () => {
     const sel = document.querySelector('.sidebar ul li.active')?.dataset.section;
-    if (sel === 'proveedores')       initProviderSearch(dynamicView);
-    else if (sel === 'ingredientes') initIngredientSearch(dynamicView);
-    else if (sel === 'recetas')      initRecipeSearch(dynamicView);
+    if (sel === 'proveedores')       showModule(initProviderSearch);
+    else if (sel === 'ingredientes') showModule(initIngredientSearch);
+    else if (sel === 'recetas')      showModule(initRecipeSearch);
   });
 
   // Calculadora
   btnCalcular.addEventListener('click', () => {
-    if (document.querySelector('.sidebar ul li.active')?.dataset.section === 'recetas') {
-      initRecipeWizard(dynamicView);
-    }
+    const sel = document.querySelector('.sidebar ul li.active')?.dataset.section;
+    if (sel === 'recetas') showModule(initRecipeWizard);
   });
 
-  // Crear familia
+  // Crear Familia
   btnCrearFamilia.addEventListener('click', () => {
-    initFamilyCreate(dynamicView);
+    showModule(initFamilyCreate);
   });
 });

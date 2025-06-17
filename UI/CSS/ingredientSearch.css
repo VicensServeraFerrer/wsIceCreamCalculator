@@ -113,10 +113,8 @@
 
 /* Ajuste para el toggle button: se usa para expandir/contraer detalles */
 .toggle-details-btn {
-    background-color: transparent;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
+    background: #ffc107;
+    color: #000;
 }
 
 /* ingredientSearch.css */

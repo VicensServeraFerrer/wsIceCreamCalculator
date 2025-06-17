@@ -34,8 +34,6 @@ ingredientRouter.get("/getAll", authByToken, async (req, res) => {
         if(!ingredients) return res.status(200).send(JSON.stringify({message: "No hay ingredientes de este tipo"}));
 
         return res.status(200).send(JSON.stringify({ingredients}))
-    
-    
 });
 
 ingredientRouter.get("/getAll/:ingredientType", authByToken, async (req, res) => {

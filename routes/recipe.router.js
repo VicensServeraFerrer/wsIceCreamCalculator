@@ -222,15 +222,23 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
         const ingredientIds = ingredients.map(ing => ing.id);
 
         const fullIngredients = await Ingredient.findAll({where: {"ingredientId": ingredientIds}});
+        
+        const fullIngredientsWithRestrictions = fullIngredients.map(ing => {
+            const bodyIngredient = ingredients.find(bing => bing.id == ing.dataValues.ingredientId)
 
-        let { matrixA, matrixB, orderedIngIds } = await buildMatrix(fullIngredients, req.body);
+            ing.dataValues["quantity"] = bodyIngredient.quantity;
+
+            return ing;
+        })
+
+        let { matrixA, matrixB, orderedIngIds, fixedQuantities } = await buildMatrix(fullIngredientsWithRestrictions, req.body);
         
         const parameters_py = {
                     "matrixA": Object.values(matrixA),
                     "matrixB": Object.values(matrixB).flat(),
-                    "ingredientIds": orderedIngIds
+                    "ingredientIds": orderedIngIds,
         }
-        console.log(parameters_py);
+
         const python = spawn('python3', ['../TFG/helpers/solver.py']);
         
         python.stdin.write(JSON.stringify(parameters_py));
@@ -252,6 +260,9 @@ recipeRouter.post("/calculate", authByToken, validateCreateRecipeByCalculatorDTO
                 console.error("❌ Hubo un error en la ejecución del script Python");
             } else {
                 const calculatedRecipe = JSON.parse(output)
+
+                fixedQuantities.map(fx => calculatedRecipe.push(fx));
+
                 const fullRecipe = {
                     "name": name,
                     "description": description,

@@ -83,7 +83,7 @@ function openIngredientModal(callback) {
       });
     } catch (e) {
       console.error('Error buscando ingredientes:', e);
-      resultsDiv.textContent = 'Error al buscar ingredientes';
+      resultsDiv.textContent = e;
     }
   });
 }
